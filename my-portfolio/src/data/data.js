@@ -52,18 +52,18 @@ export const PROJECTS = [
     image: "/images/PIELS.png"
   },
   {
-    title: "Project Two",
-    desc: "Brief project description. What problem it solves and which technologies were used.",
-    tags: ["Python", "REST API", "PostgreSQL"],
-    link: "#",
-    image: "/images/project2.png"
+    title: "Gestion de Requerimientos",
+    desc: "Full-stack platform for managing software projects and their associated requirements, activities, and tasks. ",
+    tags: ["React", "Node.js", "PostgreSQL"],
+    link: "https://github.com/JocsanPerezC/Proyecto-Requerimientos",
+    image: "/images/Gestion_Requerimientos_Iniciar_Sesion.png"
   },
   {
-    title: "Project Three",
-    desc: "Brief project description. What problem it solves and which technologies were used.",
-    tags: ["JavaScript", "Express", "Docker"],
-    link: "#",
-    image: "/images/project3.png"
+    title: "Death Race",
+    desc: "Death Race is a top-down arcade game built in C++ using the Allegro graphics library.",
+    tags: ["C++", "Allegro"],
+    link: "https://github.com/JocsanPerezC/Death_race",
+    image: "/images/DeathRace.png"
   },
 ];
 
