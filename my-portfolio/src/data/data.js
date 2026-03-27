@@ -9,10 +9,11 @@ import {
   SiFigma, SiExpo, SiFlask
 } from "react-icons/si";
 
-import { User, Wrench, FolderGit2, Mail, Share2 } from "lucide-react";
+import { User, Wrench, FolderGit2, Mail, Share2, Github } from "lucide-react";
 
 export const NAV_LINKS = [
   { label: "About",    id: "about",    icon: User },
+  { label: "GitHub",   id: "github",   icon: Github },
   { label: "Skills",   id: "skills",   icon: Wrench },
   { label: "Projects", id: "projects", icon: FolderGit2 },
   { label: "Contact",  id: "contact",  icon: Mail },
@@ -31,14 +32,11 @@ export const SKILLS = [
   { name: "MongoDB", icon: SiMongodb },
   { name: "JavaScript", icon: SiJavascript },
   { name: "TypeScript", icon: SiTypescript },
-  { name: "Git", icon: FaGitAlt },
   { name: "GitHub", icon: FaGithub },
   { name: "Figma", icon: SiFigma },
   { name: "MySQL", icon: SiMysql },
-  { name: "Redis", icon: SiRedis },
   { name: "AWS", icon: FaAws },
   { name: "Docker", icon: FaDocker },
-  { name: "Linux", icon: FaLinux },
   { name: "Flask", icon: SiFlask },
   { name: "Expo", icon: SiExpo },
 ];
