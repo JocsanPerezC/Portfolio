@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Star,
-  GitFork,
   Users,
   BookOpen,
   ExternalLink,
   Eye,
+  ChevronDown,
 } from "lucide-react";
 import { getFilteredRepos, getGitHubData } from "../lib/github";
 
@@ -51,102 +51,6 @@ function StatCard({ icon: Icon, label, value, isDark }) {
   );
 }
 
-function LanguageFilter({ languages, activeLanguage, onChange, isDark, language }) {
-  const items = ["All", ...languages.map((lang) => lang.name)];
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => {
-        const active = activeLanguage === item;
-
-        return (
-          <button
-            key={item}
-            onClick={() => onChange(item)}
-            className={[
-              "rounded-full border px-4 py-2 text-sm font-medium transition",
-              active
-                ? "border-[#7c6dfa]/40 bg-[#7c6dfa]/15 text-[#7c6dfa]"
-                : isDark
-                ? "border-white/10 bg-white/5 text-[#aab0c8] hover:border-[#7c6dfa]/25 hover:bg-[#7c6dfa]/10 hover:text-white"
-                : "border-black/10 bg-white text-[#374151] hover:border-[#7c6dfa]/25 hover:bg-[#7c6dfa]/10 hover:text-[#111827]",
-            ].join(" ")}
-          >
-            {item === "All" ? (language === "es" ? "Todos" : "All") : item}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function LanguageMiniChart({ languages, isDark, language }) {
-  const max = languages[0]?.count || 1;
-
-  return (
-    <div
-      className={[
-        "rounded-[28px] border p-6 backdrop-blur-xl",
-        isDark
-          ? "border-white/10 bg-white/5"
-          : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-      ].join(" ")}
-    >
-      <div className="mb-5">
-        <h3
-          className={[
-            "text-xl font-bold",
-            isDark ? "text-white" : "text-[#111827]",
-          ].join(" ")}
-        >
-          {language === "es" ? "Distribución por lenguaje" : "Language distribution"}
-        </h3>
-
-        <p
-          className={[
-            "mt-1 text-sm",
-            isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-          ].join(" ")}
-        >
-          {language === "es"
-            ? "Gráfico dinámico basado en tus repositorios públicos."
-            : "Dynamic chart based on your public repositories."}
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        {languages.slice(0, 6).map((lang) => (
-          <div key={lang.name}>
-            <div
-              className={[
-                "mb-1 flex items-center justify-between text-sm",
-                isDark ? "text-[#dce0f2]" : "text-[#111827]",
-              ].join(" ")}
-            >
-              <span className="font-medium">{lang.name}</span>
-              <span className={isDark ? "text-[#8f95af]" : "text-[#64748b]"}>
-                {lang.count} repos · {lang.percentage}%
-              </span>
-            </div>
-
-            <div
-              className={[
-                "h-2 overflow-hidden rounded-full",
-                isDark ? "bg-white/5" : "bg-slate-100",
-              ].join(" ")}
-            >
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-[#7c6dfa] via-[#9f8bff] to-[#c4bcff] transition-all duration-700"
-                style={{ width: `${(lang.count / max) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function RepoCard({ repo, isDark, language }) {
   return (
     <a
@@ -186,7 +90,8 @@ function RepoCard({ repo, isDark, language }) {
           isDark ? "text-[#9aa0b8]" : "text-[#475569]",
         ].join(" ")}
       >
-        {repo.description || (language === "es" ? "Sin descripción." : "No description.")}
+        {repo.description ||
+          (language === "es" ? "Sin descripción." : "No description.")}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -245,7 +150,8 @@ export default function GithubStats({ theme, language }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeLanguage, setActiveLanguage] = useState("All");
+  const [activeLanguage] = useState("All");
+  const [isReposOpen, setIsReposOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -325,7 +231,9 @@ export default function GithubStats({ theme, language }) {
               : "border-black/10 bg-white text-[#475569] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
           ].join(" ")}
         >
-          {language === "es" ? "Cargando datos de GitHub..." : "Loading GitHub data..."}
+          {language === "es"
+            ? "Cargando datos de GitHub..."
+            : "Loading GitHub data..."}
         </div>
       )}
 
@@ -372,7 +280,9 @@ export default function GithubStats({ theme, language }) {
                     ].join(" ")}
                   >
                     {data.profile.bio ||
-                      (language === "es" ? "Sin bio pública en GitHub." : "No public GitHub bio.")}
+                      (language === "es"
+                        ? "Sin bio pública en GitHub."
+                        : "No public GitHub bio.")}
                   </p>
 
                   <a
@@ -386,7 +296,8 @@ export default function GithubStats({ theme, language }) {
                         : "text-[#111827] hover:text-[#7c6dfa]",
                     ].join(" ")}
                   >
-                    {language === "es" ? "Ver perfil" : "View profile"} <ExternalLink size={16} />
+                    {language === "es" ? "Ver perfil" : "View profile"}{" "}
+                    <ExternalLink size={16} />
                   </a>
                 </div>
               </div>
@@ -418,7 +329,7 @@ export default function GithubStats({ theme, language }) {
                 isDark={isDark}
               />
             </div>
-          </div>          
+          </div>
 
           <div
             className={[
@@ -428,7 +339,7 @@ export default function GithubStats({ theme, language }) {
                 : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
             ].join(" ")}
           >
-            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3
                   className={[
@@ -436,7 +347,9 @@ export default function GithubStats({ theme, language }) {
                     isDark ? "text-white" : "text-[#111827]",
                   ].join(" ")}
                 >
-                  {language === "es" ? "Repositorios destacados" : "Highlighted repositories"}
+                  {language === "es"
+                    ? "Repositorios destacados"
+                    : "Highlighted repositories"}
                 </h3>
 
                 <p
@@ -449,32 +362,65 @@ export default function GithubStats({ theme, language }) {
                     ? "Ordenados dinámicamente por impacto y actividad reciente."
                     : "Dynamically ordered by impact and recent activity."}
                 </p>
-              </div>            
-            </div>
+              </div>
 
-            {filteredRepos.length === 0 ? (
-              <div
+              <button
+                type="button"
+                onClick={() => setIsReposOpen((prev) => !prev)}
                 className={[
-                  "rounded-2xl border p-6",
+                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
                   isDark
-                    ? "border-white/10 bg-[#111320]/70 text-[#9aa0b8]"
-                    : "border-black/10 bg-[#f8fafc] text-[#475569]",
+                    ? "border-white/10 bg-white/5 text-white hover:border-[#7c6dfa]/30 hover:bg-[#7c6dfa]/10"
+                    : "border-black/10 bg-white text-[#111827] hover:border-[#7c6dfa]/30 hover:bg-[#f8f7ff]",
                 ].join(" ")}
               >
-                {language === "es"
-                  ? "No hay repositorios para ese lenguaje."
-                  : "There are no repositories for that language."}
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {filteredRepos.map((repo) => (
-                  <RepoCard
-                    key={repo.id}
-                    repo={repo}
-                    isDark={isDark}
-                    language={language}
-                  />
-                ))}
+                <span>
+                  {isReposOpen
+                    ? language === "es"
+                      ? "Contraer"
+                      : "Collapse"
+                    : language === "es"
+                    ? "Expandir"
+                    : "Expand"}
+                </span>
+
+                <ChevronDown
+                  size={16}
+                  className={[
+                    "transition-transform duration-300",
+                    isReposOpen ? "rotate-180" : "rotate-0",
+                  ].join(" ")}
+                />
+              </button>
+            </div>
+
+            {isReposOpen && (
+              <div className="mt-6">
+                {filteredRepos.length === 0 ? (
+                  <div
+                    className={[
+                      "rounded-2xl border p-6",
+                      isDark
+                        ? "border-white/10 bg-[#111320]/70 text-[#9aa0b8]"
+                        : "border-black/10 bg-[#f8fafc] text-[#475569]",
+                    ].join(" ")}
+                  >
+                    {language === "es"
+                      ? "No hay repositorios para ese lenguaje."
+                      : "There are no repositories for that language."}
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {filteredRepos.map((repo) => (
+                      <RepoCard
+                        key={repo.id}
+                        repo={repo}
+                        isDark={isDark}
+                        language={language}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

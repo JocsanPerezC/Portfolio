@@ -107,6 +107,16 @@ export default function Socials({ theme, language }) {
           ))}
         </div>
       </div>
+
+          {/*  GIF  */}
+      <div className="mt-10 flex justify-center">
+        <img
+          src="/gifs/kirbyCaminando.gif"
+          alt="Kirby walking"
+          className="w-40 sm:w-48 md:w-56 opacity-80 transition duration-300 hover:scale-105"
+        />
+      </div>
+
     </section>
   );
 }

@@ -85,7 +85,6 @@ export default function App() {
         <Hero         theme={theme} language={language} />
         <TechSphere   theme={theme} language={language} />
         <GithubStats  theme={theme} language={language} />
-        <Skills       theme={theme} language={language} />
         <Projects     theme={theme} language={language} />
         <Contact      theme={theme} language={language} />
         <Socials      theme={theme} language={language} />

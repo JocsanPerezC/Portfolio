@@ -43,7 +43,7 @@ export default function Hero({ theme, language }) {
         </span>
       </h1>
 
-      <div className="mt-6 flex items-center gap-3">
+      <div className="mt- flex items-center gap-3">
         <span className="h-px w-8 bg-[#7c6dfa]/60" />
         <p
           className={[
@@ -153,6 +153,15 @@ export default function Hero({ theme, language }) {
             </p>
           </div>
         ))}
+      </div>
+
+      {/*  GIF  */}
+      <div className="flex justify-center">
+        <img
+          src="/gifs/kirbyDormido.gif"
+          alt="Kirby sleeping"
+          className="w-40 sm:w-48 md:w-56 opacity-80 transition duration-300 hover:scale-105"
+        />
       </div>
     </section>
   );

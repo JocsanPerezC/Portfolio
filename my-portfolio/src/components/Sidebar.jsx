@@ -19,9 +19,9 @@ export default function Sidebar({
     <>
       <aside
         className={[
-          "fixed top-0 left-0 z-[100] flex h-screen flex-col border-r border-white/10 backdrop-blur-xl transition-all duration-300",
+          "fixed top-0 left-0 z-[100] flex h-screen flex-col border-r backdrop-blur-xl transition-all duration-300",
           "hidden md:flex",
-          isDark ? "bg-[#0d0e1a]/95" : "bg-white/95 border-black/10",
+          isDark ? "border-white/10 bg-[#0d0e1a]/95" : "border-black/10 bg-white/95",
           sidebarOpen ? "w-[220px]" : "w-[72px]",
         ].join(" ")}
       >
@@ -80,7 +80,6 @@ export default function Sidebar({
           ))}
         </nav>
 
-        {/* Bottom controls */}
         <div
           className={[
             "border-t p-3",
@@ -145,7 +144,6 @@ export default function Sidebar({
         </div>
       </aside>
 
-      {/* Mobile sidebar */}
       <aside
         className={[
           "fixed top-0 left-0 z-[150] flex h-screen w-[260px] flex-col border-r backdrop-blur-xl transition-transform duration-300 md:hidden",
@@ -170,10 +168,10 @@ export default function Sidebar({
 
           <button
             className={[
-              "flex h-8 w-8 items-center justify-center rounded-lg border",
+              "ml-auto flex h-8 w-8 items-center justify-center rounded-lg border transition",
               isDark
-                ? "border-white/10 bg-white/5 text-[#8888a8]"
-                : "border-black/10 bg-black/[0.03] text-[#4b5563]",
+                ? "border-white/10 bg-white/5 text-[#8888a8] hover:border-[#7c6dfa]/40 hover:text-[#a599fd]"
+                : "border-black/10 bg-black/[0.03] text-[#4b5563] hover:border-[#7c6dfa]/40 hover:text-[#7c6dfa]",
             ].join(" ")}
             onClick={() => setMobileOpen(false)}
             aria-label="Close sidebar"
@@ -268,26 +266,27 @@ export default function Sidebar({
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label="Toggle menu"
         className={[
-          "fixed left-4 top-4 z-[200] flex h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-xl border backdrop-blur md:hidden",
+          "fixed left-4 top-4 z-[200] h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-xl border backdrop-blur md:hidden",
+          mobileOpen ? "hidden" : "flex",
           isDark
             ? "border-white/10 bg-[#111320]/90 text-white"
             : "border-black/10 bg-white/90 text-[#111827]",
         ].join(" ")}
       >
         <span
-          className={`block h-[1.5px] w-[18px] rounded transition ${
-            mobileOpen ? "translate-y-[7px] rotate-45" : ""
-          } ${isDark ? "bg-white" : "bg-[#111827]"}`}
+          className={`block h-[1.5px] w-[18px] rounded ${
+            isDark ? "bg-white" : "bg-[#111827]"
+          }`}
         />
         <span
-          className={`block h-[1.5px] w-[13px] rounded transition ${
-            mobileOpen ? "opacity-0" : ""
-          } ${isDark ? "bg-white" : "bg-[#111827]"}`}
+          className={`block h-[1.5px] w-[13px] rounded ${
+            isDark ? "bg-white" : "bg-[#111827]"
+          }`}
         />
         <span
-          className={`block h-[1.5px] w-[18px] rounded transition ${
-            mobileOpen ? "-translate-y-[7px] -rotate-45" : ""
-          } ${isDark ? "bg-white" : "bg-[#111827]"}`}
+          className={`block h-[1.5px] w-[18px] rounded ${
+            isDark ? "bg-white" : "bg-[#111827]"
+          }`}
         />
       </button>
     </>
