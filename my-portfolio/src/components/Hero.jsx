@@ -1,7 +1,53 @@
-import { CV_PATH } from "../data/data";
+import { useEffect, useMemo, useState } from "react";
+import { CV_PATH, PROFILE_CONTENT } from "../data/data";
 
 export default function Hero({ theme, language }) {
   const isDark = theme === "dark";
+  const typewriterPhrases = useMemo(
+    () => PROFILE_CONTENT.typewriterPhrases[language] ?? PROFILE_CONTENT.typewriterPhrases.en,
+    [language]
+  );
+  const [activePhraseIndex, setActivePhraseIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    setActivePhraseIndex(0);
+    setTypedText("");
+    setIsDeleting(false);
+  }, [language]);
+
+  useEffect(() => {
+    const currentPhrase = typewriterPhrases[activePhraseIndex] ?? "";
+    const isPhraseComplete = typedText === currentPhrase;
+    const isPhraseEmpty = typedText.length === 0;
+
+    let timeoutMs = isDeleting ? 28 : 52;
+
+    if (!isDeleting && isPhraseComplete) {
+      timeoutMs = 1350;
+    } else if (isDeleting && isPhraseEmpty) {
+      timeoutMs = 220;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (!isDeleting && isPhraseComplete) {
+        setIsDeleting(true);
+        return;
+      }
+
+      if (isDeleting && isPhraseEmpty) {
+        setIsDeleting(false);
+        setActivePhraseIndex((currentIndex) => (currentIndex + 1) % typewriterPhrases.length);
+        return;
+      }
+
+      const nextLength = isDeleting ? typedText.length - 1 : typedText.length + 1;
+      setTypedText(currentPhrase.slice(0, nextLength));
+    }, timeoutMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activePhraseIndex, isDeleting, typedText, typewriterPhrases]);
 
   return (
     <section
@@ -9,8 +55,9 @@ export default function Hero({ theme, language }) {
       className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-24 sm:px-10 lg:px-14"
     >
       <div
+        style={{ "--delay": "80ms" }}
         className={[
-          "mb-8 inline-flex w-fit items-center gap-2.5 rounded-full border px-4 py-2",
+          "reveal mb-8 inline-flex w-fit items-center gap-2.5 rounded-full border px-4 py-2",
           isDark
             ? "border-white/10 bg-white/5"
             : "border-black/10 bg-white/70 shadow-sm",
@@ -27,23 +74,24 @@ export default function Hero({ theme, language }) {
             isDark ? "text-[#9aa0b8]" : "text-[#64748b]",
           ].join(" ")}
         >
-          {language === "es"
-            ? "disponible para oportunidades"
-            : "available for opportunities"}
+          {PROFILE_CONTENT.availability[language] ?? PROFILE_CONTENT.availability.en}
         </span>
       </div>
 
-      <h1 className="max-w-4xl text-5xl font-extrabold leading-none tracking-tight sm:text-6xl lg:text-7xl">
+      <h1
+        style={{ "--delay": "180ms" }}
+        className="reveal max-w-4xl text-5xl font-extrabold leading-none tracking-tight sm:text-6xl lg:text-7xl"
+      >
         <span className={isDark ? "text-white" : "text-[#111827]"}>
-          Jocsan
+          {PROFILE_CONTENT.firstName}
         </span>
         <br />
         <span className="bg-gradient-to-r from-[#c8c2ff] via-[#9d8fff] to-[#7c6dfa] bg-clip-text text-transparent">
-          Pérez Coto
+          {PROFILE_CONTENT.lastName}
         </span>
       </h1>
 
-      <div className="mt- flex items-center gap-3">
+      <div style={{ "--delay": "280ms" }} className="reveal mt-4 flex items-center gap-3">
         <span className="h-px w-8 bg-[#7c6dfa]/60" />
         <p
           className={[
@@ -51,44 +99,45 @@ export default function Hero({ theme, language }) {
             isDark ? "text-[#9aa0b8]" : "text-[#64748b]",
           ].join(" ")}
         >
-          Software Developer
+          {PROFILE_CONTENT.title[language] ?? PROFILE_CONTENT.title.en}
         </p>
       </div>
 
       <p
+        style={{ "--delay": "360ms" }}
         className={[
-          "mt-6 max-w-2xl text-lg leading-8",
+          "reveal mt-6 max-w-2xl min-h-[136px] text-lg leading-8 sm:min-h-[104px]",
           isDark ? "text-[#c8c8e0]" : "text-[#475569]",
         ].join(" ")}
       >
-        {language === "es"
-          ? "Construyo experiencias digitales con foco en "
-          : "I build digital experiences focused on "}
         <span
-          className={isDark ? "font-medium text-white" : "font-medium text-[#111827]"}
+          className={[
+            "typewriter-text",
+            isDark ? "text-[#c8c8e0]" : "text-[#475569]",
+          ].join(" ")}
         >
-          {language === "es" ? "interfaces limpias" : "clean interfaces"}
+          {typedText}
+          <span
+            className={[
+              "typewriter-cursor ml-1 inline-block align-[-0.08em]",
+              isDark ? "text-white" : "text-[#111827]",
+            ].join(" ")}
+            aria-hidden="true"
+          >
+            |
+          </span>
         </span>
-        ,{" "}
-        <span
-          className={isDark ? "font-medium text-white" : "font-medium text-[#111827]"}
-        >
-          {language === "es" ? "código mantenible" : "maintainable code"}
-        </span>{" "}
-        {language === "es"
-          ? "y soluciones que resuelven problemas reales."
-          : "and solutions that solve real problems."}
         <span
           className={[
             "mt-2 block text-base",
             isDark ? "text-[#8a90aa]" : "text-[#64748b]",
           ].join(" ")}
         >
-          Cartago, Costa Rica
+          {PROFILE_CONTENT.location[language] ?? PROFILE_CONTENT.location.en}
         </span>
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-4">
+      <div style={{ "--delay": "470ms" }} className="reveal mt-8 flex flex-wrap gap-4">
         <a
           href="#projects"
           className={[
@@ -119,12 +168,12 @@ export default function Hero({ theme, language }) {
         {[
           {
             value: "2+",
-            label: language === "es" ? "años experiencia" : "years experience",
+            label: language === "es" ? "anos de experiencia" : "years experience",
             color: isDark ? "text-white" : "text-[#111827]",
           },
           {
             value: "19",
-            label: language === "es" ? "tecnologías" : "technologies",
+            label: language === "es" ? "tecnologias" : "technologies",
             color: "text-[#7c6dfa]",
           },
           {
@@ -135,8 +184,9 @@ export default function Hero({ theme, language }) {
         ].map(({ value, label, color }) => (
           <div
             key={label}
+            style={{ "--delay": `${560 + ["2+", "19", "3+"].indexOf(value) * 90}ms` }}
             className={[
-              "min-w-[120px] rounded-3xl border p-5 text-center transition hover:-translate-y-1",
+              "reveal-panel min-w-[120px] rounded-3xl border p-5 text-center transition hover:-translate-y-1",
               isDark
                 ? "border-white/10 bg-white/5 shadow-[0_20px_60px_rgba(124,109,250,0.08)] hover:border-[#7c6dfa]/30"
                 : "border-black/10 bg-white/80 shadow-[0_16px_40px_rgba(15,23,42,0.06)] hover:border-[#7c6dfa]/20",
@@ -153,15 +203,6 @@ export default function Hero({ theme, language }) {
             </p>
           </div>
         ))}
-      </div>
-
-      {/*  GIF  */}
-      <div className="flex justify-center">
-        <img
-          src="/gifs/kirbyDormido.gif"
-          alt="Kirby sleeping"
-          className="w-40 sm:w-48 md:w-56 opacity-80 transition duration-300 hover:scale-105"
-        />
       </div>
     </section>
   );

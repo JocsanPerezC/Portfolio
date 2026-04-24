@@ -26,7 +26,7 @@ export default function Contact({ theme, language }) {
 
       setStatus({ sending: false, success: true, error: "" });
       setFormData({ name: "", email: "", message: "" });
-      setTimeout(() => setStatus((p) => ({ ...p, success: false })), 3000);
+      setTimeout(() => setStatus((prev) => ({ ...prev, success: false })), 3000);
     } catch (err) {
       console.error(err);
       setStatus({
@@ -34,17 +34,17 @@ export default function Contact({ theme, language }) {
         success: false,
         error:
           language === "es"
-            ? "Algo salió mal. Intenta de nuevo."
+            ? "Algo salio mal. Intenta de nuevo."
             : "Something went wrong. Please try again.",
       });
     }
   };
 
   const inputClass = [
-    "w-full rounded-xl border px-4 py-3 text-sm outline-none transition-all duration-200 resize-vertical",
+    "w-full resize-vertical rounded-xl border px-4 py-3 text-sm outline-none transition-all duration-200",
     isDark
-      ? "bg-[#111118] border-[#2a2a38] text-[#c8c8e0] placeholder:text-[#52526a] focus:border-[#7c6dfa] focus:shadow-[0_0_0_3px_rgba(124,109,250,0.08)]"
-      : "bg-white border-black/10 text-[#111827] placeholder:text-[#64748b] focus:border-[#7c6dfa] focus:shadow-[0_0_0_3px_rgba(124,109,250,0.08)]",
+      ? "border-[#2a2a38] bg-[#111118] text-[#c8c8e0] placeholder:text-[#52526a] focus:border-[#7c6dfa] focus:shadow-[0_0_0_3px_rgba(124,109,250,0.08)]"
+      : "border-black/10 bg-white text-[#111827] placeholder:text-[#64748b] focus:border-[#7c6dfa] focus:shadow-[0_0_0_3px_rgba(124,109,250,0.08)]",
   ].join(" ");
 
   return (
@@ -54,38 +54,42 @@ export default function Contact({ theme, language }) {
     >
       <div className="mx-auto max-w-3xl text-center">
         <div className="mb-14">
-          <p className="mb-4 text-[0.7rem] uppercase tracking-[0.2em] text-[#7c6dfa]">
+          <p style={{ "--delay": "60ms" }} className="reveal mb-4 text-[0.7rem] uppercase tracking-[0.2em] text-[#7c6dfa]">
             {language === "es" ? "Contacto" : "Contact"}
           </p>
 
           <h2
+            style={{ "--delay": "150ms" }}
             className={[
-              "mb-4 text-4xl font-bold md:text-5xl",
+              "reveal mb-4 text-4xl font-bold md:text-5xl",
               isDark ? "text-white" : "text-[#111827]",
             ].join(" ")}
           >
-            {language === "es" ? "¿Hablamos?" : "Let’s talk"}
+            {language === "es" ? "Hablemos" : "Let's talk"}
           </h2>
 
           <p
+            style={{ "--delay": "240ms" }}
             className={[
-              "leading-relaxed",
+              "reveal leading-relaxed",
               isDark ? "text-[#c8c8e0]" : "text-[#475569]",
             ].join(" ")}
           >
             {language === "es"
               ? "Estoy abierto a oportunidades, colaboraciones y proyectos interesantes."
-              : "I’m open to opportunities, collaborations, and interesting projects."}
+              : "I'm open to opportunities, collaborations, and interesting projects."}
             <br />
             {language === "es"
-              ? "Si tienes algo en mente, me encantaría escucharte."
-              : "If you have something in mind, I’d love to hear about it."}
+              ? "Si tienes algo en mente, me encantaria escucharte."
+              : "If you have something in mind, I'd love to hear about it."}
           </p>
         </div>
 
         <div
+          style={{ "--delay": "340ms" }}
+          data-spotlight
           className={[
-            "flex flex-col items-center gap-8 rounded-3xl border p-8 md:p-12",
+            "reveal-panel flex flex-col items-center gap-8 rounded-3xl border p-8 md:p-12",
             isDark
               ? "border-[#2a2a38] bg-[#16161f]/40 shadow-[0_0_60px_rgba(124,109,250,0.12)]"
               : "border-black/10 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)]",
@@ -100,7 +104,14 @@ export default function Contact({ theme, language }) {
                 : "border-[#7c6dfa]/30 text-[#7c6dfa] hover:bg-[#7c6dfa] hover:text-white",
             ].join(" ")}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -120,7 +131,13 @@ export default function Contact({ theme, language }) {
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className={isDark ? "text-[0.72rem] uppercase tracking-[0.1em] text-[#52526a] font-medium" : "text-[0.72rem] uppercase tracking-[0.1em] text-[#64748b] font-medium"}>
+                  <label
+                    className={
+                      isDark
+                        ? "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#52526a]"
+                        : "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#64748b]"
+                    }
+                  >
                     {language === "es" ? "Nombre" : "Name"}
                   </label>
                   <input
@@ -135,7 +152,13 @@ export default function Contact({ theme, language }) {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className={isDark ? "text-[0.72rem] uppercase tracking-[0.1em] text-[#52526a] font-medium" : "text-[0.72rem] uppercase tracking-[0.1em] text-[#64748b] font-medium"}>
+                  <label
+                    className={
+                      isDark
+                        ? "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#52526a]"
+                        : "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#64748b]"
+                    }
+                  >
                     Email
                   </label>
                   <input
@@ -151,7 +174,13 @@ export default function Contact({ theme, language }) {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={isDark ? "text-[0.72rem] uppercase tracking-[0.1em] text-[#52526a] font-medium" : "text-[0.72rem] uppercase tracking-[0.1em] text-[#64748b] font-medium"}>
+                <label
+                  className={
+                    isDark
+                      ? "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#52526a]"
+                      : "text-[0.72rem] font-medium uppercase tracking-[0.1em] text-[#64748b]"
+                  }
+                >
                   {language === "es" ? "Mensaje" : "Message"}
                 </label>
                 <textarea
@@ -180,15 +209,15 @@ export default function Contact({ theme, language }) {
                     ? "Enviando..."
                     : "Sending..."
                   : language === "es"
-                  ? "Enviar mensaje"
-                  : "Send message"}
+                    ? "Enviar mensaje"
+                    : "Send message"}
               </button>
 
               {status.success && (
                 <p className="text-center text-sm text-green-500">
                   {language === "es"
-                    ? "✓ Mensaje enviado correctamente"
-                    : "✓ Message sent successfully"}
+                    ? "Mensaje enviado correctamente"
+                    : "Message sent successfully"}
                 </p>
               )}
 
@@ -207,8 +236,15 @@ export default function Contact({ theme, language }) {
                   : "bg-[#111827] text-white hover:bg-[#1f2937]",
               ].join(" ")}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>

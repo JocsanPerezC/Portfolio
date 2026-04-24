@@ -9,11 +9,13 @@ import {
 } from "lucide-react";
 import { getFilteredRepos, getGitHubData } from "../lib/github";
 
-function StatCard({ icon: Icon, label, value, isDark }) {
+function StatCard({ icon: Icon, label, value, isDark, style }) {
   return (
     <div
+      style={style}
+      data-spotlight
       className={[
-        "rounded-3xl border p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30 hover:shadow-[0_20px_80px_rgba(124,109,250,0.12)]",
+        "reveal-panel rounded-3xl border p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30 hover:shadow-[0_20px_80px_rgba(124,109,250,0.12)]",
         isDark
           ? "border-white/10 bg-white/5"
           : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
@@ -51,17 +53,19 @@ function StatCard({ icon: Icon, label, value, isDark }) {
   );
 }
 
-function RepoCard({ repo, isDark, language }) {
+function RepoCard({ repo, isDark, language, style }) {
   return (
     <a
+      style={style}
       href={repo.html_url}
       target="_blank"
       rel="noreferrer"
+      data-spotlight
       className={[
-        "group rounded-3xl border p-5 transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30",
+        "reveal-panel group rounded-3xl border p-5 transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30",
         isDark
           ? "border-white/10 bg-[#111320]/80 hover:bg-[#14182b]"
-          : "border-black/10 bg-white hover:bg-[#fcfcff] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
+          : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)] hover:bg-[#fcfcff]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-3">
@@ -90,8 +94,7 @@ function RepoCard({ repo, isDark, language }) {
           isDark ? "text-[#9aa0b8]" : "text-[#475569]",
         ].join(" ")}
       >
-        {repo.description ||
-          (language === "es" ? "Sin descripción." : "No description.")}
+        {repo.description || (language === "es" ? "Sin descripcion." : "No description.")}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -116,7 +119,7 @@ function RepoCard({ repo, isDark, language }) {
               : "border-black/10 bg-[#f8fafc] text-[#111827]",
           ].join(" ")}
         >
-          ★ {repo.stargazers_count}
+          Star {repo.stargazers_count}
         </span>
 
         <span
@@ -181,6 +184,7 @@ export default function GithubStats({ theme, language }) {
     }
 
     load();
+
     return () => {
       mounted = false;
     };
@@ -197,48 +201,49 @@ export default function GithubStats({ theme, language }) {
       className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
     >
       <div className="mb-10">
-        <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
+        <p style={{ "--delay": "60ms" }} className="reveal mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
           GitHub
         </p>
 
         <h2
+          style={{ "--delay": "150ms" }}
           className={[
-            "text-4xl font-bold tracking-tight md:text-5xl",
+            "reveal text-4xl font-bold tracking-tight md:text-5xl",
             isDark ? "text-white" : "text-[#111827]",
           ].join(" ")}
         >
-          {language === "es" ? "Actividad y estadísticas" : "Activity and stats"}
+          {language === "es" ? "Actividad y estadisticas" : "Activity and stats"}
         </h2>
 
         <p
+          style={{ "--delay": "240ms" }}
           className={[
-            "mt-4 max-w-2xl text-base leading-7",
+            "reveal mt-4 max-w-2xl text-base leading-7",
             isDark ? "text-[#9aa0b8]" : "text-[#475569]",
           ].join(" ")}
         >
           {language === "es"
-            ? "Datos cargados dinámicamente desde mi perfil de GitHub."
+            ? "Datos cargados dinamicamente desde mi perfil de GitHub."
             : "Data loaded dynamically from my GitHub profile."}
         </p>
       </div>
 
       {loading && (
         <div
+          style={{ "--delay": "320ms" }}
           className={[
-            "rounded-[32px] border p-8",
+            "reveal-panel rounded-[32px] border p-8",
             isDark
               ? "border-white/10 bg-white/5 text-[#9aa0b8]"
               : "border-black/10 bg-white text-[#475569] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
           ].join(" ")}
         >
-          {language === "es"
-            ? "Cargando datos de GitHub..."
-            : "Loading GitHub data..."}
+          {language === "es" ? "Cargando datos de GitHub..." : "Loading GitHub data..."}
         </div>
       )}
 
       {error && (
-        <div className="rounded-[32px] border border-red-400/20 bg-red-400/10 p-8 text-red-500">
+        <div className="reveal-panel rounded-[32px] border border-red-400/20 bg-red-400/10 p-8 text-red-500">
           {error}
         </div>
       )}
@@ -247,8 +252,10 @@ export default function GithubStats({ theme, language }) {
         <div className="space-y-8">
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
             <div
+              style={{ "--delay": "320ms" }}
+              data-spotlight
               className={[
-                "rounded-[32px] border p-6 backdrop-blur-xl",
+                "reveal-panel rounded-[32px] border p-6 backdrop-blur-xl",
                 isDark
                   ? "border-white/10 bg-white/5"
                   : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
@@ -281,7 +288,7 @@ export default function GithubStats({ theme, language }) {
                   >
                     {data.profile.bio ||
                       (language === "es"
-                        ? "Sin bio pública en GitHub."
+                        ? "Sin bio publica en GitHub."
                         : "No public GitHub bio.")}
                   </p>
 
@@ -306,34 +313,40 @@ export default function GithubStats({ theme, language }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <StatCard
                 icon={BookOpen}
-                label={language === "es" ? "Repos públicos" : "Public repos"}
+                label={language === "es" ? "Repos publicos" : "Public repos"}
                 value={data.profile.public_repos}
                 isDark={isDark}
+                style={{ "--delay": "420ms" }}
               />
               <StatCard
                 icon={Users}
                 label={language === "es" ? "Seguidores" : "Followers"}
                 value={data.profile.followers}
                 isDark={isDark}
+                style={{ "--delay": "500ms" }}
               />
               <StatCard
                 icon={Star}
                 label={language === "es" ? "Estrellas totales" : "Total stars"}
                 value={data.stats.totalStars}
                 isDark={isDark}
+                style={{ "--delay": "580ms" }}
               />
               <StatCard
                 icon={Eye}
                 label={language === "es" ? "Watchers totales" : "Total watchers"}
                 value={data.stats.totalWatchers}
                 isDark={isDark}
+                style={{ "--delay": "660ms" }}
               />
             </div>
           </div>
 
           <div
+            style={{ "--delay": "500ms" }}
+            data-spotlight
             className={[
-              "rounded-[32px] border p-6 backdrop-blur-xl",
+              "reveal-panel rounded-[32px] border p-6 backdrop-blur-xl",
               isDark
                 ? "border-white/10 bg-white/5"
                 : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
@@ -359,7 +372,7 @@ export default function GithubStats({ theme, language }) {
                   ].join(" ")}
                 >
                   {language === "es"
-                    ? "Ordenados dinámicamente por impacto y actividad reciente."
+                    ? "Ordenados dinamicamente por impacto y actividad reciente."
                     : "Dynamically ordered by impact and recent activity."}
                 </p>
               </div>
@@ -380,8 +393,8 @@ export default function GithubStats({ theme, language }) {
                       ? "Contraer"
                       : "Collapse"
                     : language === "es"
-                    ? "Expandir"
-                    : "Expand"}
+                      ? "Expandir"
+                      : "Expand"}
                 </span>
 
                 <ChevronDown
@@ -417,6 +430,7 @@ export default function GithubStats({ theme, language }) {
                         repo={repo}
                         isDark={isDark}
                         language={language}
+                        style={{ "--delay": "120ms" }}
                       />
                     ))}
                   </div>

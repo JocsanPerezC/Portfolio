@@ -197,34 +197,41 @@ export default function TechSphere({ theme, language }) {
       className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
     >
       <div className="mb-10">
-        <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
-          {language === "es" ? "Tecnologías" : "Technologies"}
+        <p
+          style={{ "--delay": "60ms" }}
+          className="reveal mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]"
+        >
+          {language === "es" ? "Tecnologias" : "Technologies"}
         </p>
 
         <h2
+          style={{ "--delay": "150ms" }}
           className={[
-            "text-4xl font-bold tracking-tight md:text-5xl",
+            "reveal text-4xl font-bold tracking-tight md:text-5xl",
             isDark ? "text-white" : "text-[#111827]",
           ].join(" ")}
         >
-          {language === "es" ? "Tecnologías" : "Technologies"}
+          {language === "es" ? "Tecnologias" : "Technologies"}
         </h2>
 
         <p
+          style={{ "--delay": "240ms" }}
           className={[
-            "mt-4 max-w-2xl text-base leading-7",
+            "reveal mt-4 max-w-2xl text-base leading-7",
             isDark ? "text-[#9aa0b8]" : "text-[#475569]",
           ].join(" ")}
         >
           {language === "es"
-            ? "Una visualización interactiva de mis tecnologías más importantes."
+            ? "Una visualizacion interactiva de mis tecnologias mas importantes."
             : "An interactive visualization of my most important technologies."}
         </p>
       </div>
 
       <div
+        style={{ "--delay": "340ms" }}
+        data-spotlight
         className={[
-          "h-[560px] overflow-hidden rounded-[32px] border backdrop-blur-xl",
+          "reveal-panel h-[560px] overflow-hidden rounded-[32px] border backdrop-blur-xl",
           isDark
             ? "border-white/10 bg-[radial-gradient(circle_at_top,rgba(124,109,250,0.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]"
             : "border-black/10 bg-[radial-gradient(circle_at_top,rgba(124,109,250,0.10),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.82),rgba(248,250,252,0.96))] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",

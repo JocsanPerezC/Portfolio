@@ -19,8 +19,7 @@ export default function Sidebar({
     <>
       <aside
         className={[
-          "fixed top-0 left-0 z-[100] flex h-screen flex-col border-r backdrop-blur-xl transition-all duration-300",
-          "hidden md:flex",
+          "fixed top-0 left-0 z-[100] hidden h-screen flex-col border-r backdrop-blur-xl transition-all duration-300 md:flex",
           isDark ? "border-white/10 bg-[#0d0e1a]/95" : "border-black/10 bg-white/95",
           sidebarOpen ? "w-[220px]" : "w-[72px]",
         ].join(" ")}
@@ -70,8 +69,8 @@ export default function Sidebar({
                     ? "bg-[#7c6dfa]/15 text-white"
                     : "bg-[#7c6dfa]/12 text-[#111827]"
                   : isDark
-                  ? "text-[#8888a8] hover:bg-[#7c6dfa]/10 hover:text-white"
-                  : "text-[#6b7280] hover:bg-[#7c6dfa]/10 hover:text-[#111827]",
+                    ? "text-[#8888a8] hover:bg-[#7c6dfa]/10 hover:text-white"
+                    : "text-[#6b7280] hover:bg-[#7c6dfa]/10 hover:text-[#111827]",
               ].join(" ")}
             >
               <Icon size={16} className="shrink-0" />
@@ -195,8 +194,8 @@ export default function Sidebar({
                     ? "bg-[#7c6dfa]/15 text-white"
                     : "bg-[#7c6dfa]/12 text-[#111827]"
                   : isDark
-                  ? "text-[#8888a8] hover:bg-[#7c6dfa]/10 hover:text-white"
-                  : "text-[#6b7280] hover:bg-[#7c6dfa]/10 hover:text-[#111827]",
+                    ? "text-[#8888a8] hover:bg-[#7c6dfa]/10 hover:text-white"
+                    : "text-[#6b7280] hover:bg-[#7c6dfa]/10 hover:text-[#111827]",
               ].join(" ")}
             >
               <Icon size={16} />

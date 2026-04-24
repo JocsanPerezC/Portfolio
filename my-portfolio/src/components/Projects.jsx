@@ -9,13 +9,14 @@ export default function Projects({ theme, language }) {
       className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
     >
       <div className="mb-14">
-        <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
+        <p style={{ "--delay": "60ms" }} className="reveal mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
           {language === "es" ? "Proyectos" : "Projects"}
         </p>
 
         <h2
+          style={{ "--delay": "150ms" }}
           className={[
-            "text-4xl font-bold tracking-tight md:text-5xl",
+            "reveal text-4xl font-bold tracking-tight md:text-5xl",
             isDark ? "text-white" : "text-[#111827]",
           ].join(" ")}
         >
@@ -23,8 +24,9 @@ export default function Projects({ theme, language }) {
         </h2>
 
         <p
+          style={{ "--delay": "240ms" }}
           className={[
-            "mt-4 max-w-2xl text-base leading-7",
+            "reveal mt-4 max-w-2xl text-base leading-7",
             isDark ? "text-[#9aa0b8]" : "text-[#475569]",
           ].join(" ")}
         >
@@ -38,11 +40,13 @@ export default function Projects({ theme, language }) {
         {PROJECTS.map((project) => (
           <a
             key={project.title}
+            style={{ "--delay": `${340 + PROJECTS.findIndex((item) => item.title === project.title) * 110}ms` }}
             href={project.link}
             target="_blank"
             rel="noreferrer"
+            data-spotlight
             className={[
-              "group overflow-hidden rounded-[28px] border backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30 hover:shadow-[0_25px_80px_rgba(124,109,250,0.10)]",
+              "reveal-panel group overflow-hidden rounded-[28px] border backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30 hover:shadow-[0_25px_80px_rgba(124,109,250,0.10)]",
               isDark
                 ? "border-white/10 bg-white/5"
                 : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
@@ -99,7 +103,7 @@ export default function Projects({ theme, language }) {
               </div>
 
               <div className="mt-6 text-sm font-semibold text-[#7c6dfa]">
-                {language === "es" ? "Ver proyecto →" : "View project →"}
+                {language === "es" ? "Ver proyecto ->" : "View project ->"}
               </div>
             </div>
           </a>
