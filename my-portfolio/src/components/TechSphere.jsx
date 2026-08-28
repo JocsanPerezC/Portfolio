@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Float,
@@ -55,16 +56,45 @@ const featuredTechs = [
   },
 ];
 
-function TechBubble({ name, position, size = 1, color = "#7c6dfa", Icon, isDark }) {
+function FloatWrapper({ children, speed, rotationIntensity, floatIntensity, motionEnabled }) {
+  if (!motionEnabled) {
+    return children;
+  }
+
   return (
-    <Float speed={2} rotationIntensity={0.3} floatIntensity={1.1}>
+    <Float
+      speed={speed}
+      rotationIntensity={rotationIntensity}
+      floatIntensity={floatIntensity}
+    >
+      {children}
+    </Float>
+  );
+}
+
+function TechBubble({
+  name,
+  position,
+  size = 1,
+  color = "#7c6dfa",
+  Icon,
+  isDark,
+  motionEnabled,
+}) {
+  return (
+    <FloatWrapper
+      speed={1.35}
+      rotationIntensity={0.16}
+      floatIntensity={0.55}
+      motionEnabled={motionEnabled}
+    >
       <group position={position}>
         <mesh>
-          <sphereGeometry args={[size * 1.18, 32, 32]} />
+          <sphereGeometry args={[size * 1.18, 18, 18]} />
           <meshBasicMaterial color={color} transparent opacity={0.08} />
         </mesh>
 
-        <Sphere args={[size, 64, 64]}>
+        <Sphere args={[size, 28, 28]}>
           <meshPhysicalMaterial
             color={color}
             transparent
@@ -118,20 +148,25 @@ function TechBubble({ name, position, size = 1, color = "#7c6dfa", Icon, isDark 
           </Text>
         </Billboard>
       </group>
-    </Float>
+    </FloatWrapper>
   );
 }
 
-function CenterBubble({ isDark, language }) {
+function CenterBubble({ isDark, language, motionEnabled }) {
   return (
-    <Float speed={1.5} rotationIntensity={0.15} floatIntensity={0.6}>
+    <FloatWrapper
+      speed={1}
+      rotationIntensity={0.08}
+      floatIntensity={0.3}
+      motionEnabled={motionEnabled}
+    >
       <group position={[0, 0, -1.15]}>
         <mesh>
-          <sphereGeometry args={[1.22, 40, 40]} />
+          <sphereGeometry args={[1.22, 22, 22]} />
           <meshBasicMaterial color="#a78bfa" transparent opacity={0.08} />
         </mesh>
 
-        <Sphere args={[1.02, 64, 64]}>
+        <Sphere args={[1.02, 28, 28]}>
           <meshPhysicalMaterial
             color="#7c6dfa"
             transparent
@@ -165,7 +200,7 @@ function CenterBubble({ isDark, language }) {
           </Text>
         </Billboard>
       </group>
-    </Float>
+    </FloatWrapper>
   );
 }
 
@@ -188,12 +223,34 @@ function BackgroundOrbs() {
   );
 }
 
-export default function TechSphere({ theme, language }) {
+export default function TechSphere({ theme, language, performanceMode = "full" }) {
+  const sectionRef = useRef(null);
+  const [renderCanvas, setRenderCanvas] = useState(false);
   const isDark = theme === "dark";
+  const motionEnabled = performanceMode === "full";
+
+  useEffect(() => {
+    if (!sectionRef.current || typeof IntersectionObserver === "undefined") {
+      setRenderCanvas(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setRenderCanvas(entry.isIntersecting);
+      },
+      { threshold: 0.2, rootMargin: "120px 0px" }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
       id="tech-sphere"
+      ref={sectionRef}
       className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
     >
       <div className="mb-10">
@@ -237,34 +294,50 @@ export default function TechSphere({ theme, language }) {
             : "border-black/10 bg-[radial-gradient(circle_at_top,rgba(124,109,250,0.10),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.82),rgba(248,250,252,0.96))] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
         ].join(" ")}
       >
-        <Canvas camera={{ position: [0, 0, 8.5], fov: 42 }}>
-          <ambientLight intensity={1} />
-          <directionalLight position={[5, 5, 5]} intensity={2.1} />
-          <pointLight position={[-5, -3, 5]} intensity={1.35} />
-          <pointLight position={[0, 4, 2]} intensity={0.8} color="#c4b5fd" />
+        {renderCanvas && (
+          <Canvas
+            dpr={performanceMode === "full" ? [1, 1.4] : [1, 1]}
+            gl={{
+              antialias: performanceMode === "full",
+              alpha: true,
+              powerPreference:
+                performanceMode === "full" ? "high-performance" : "low-power",
+            }}
+            camera={{ position: [0, 0, 8.5], fov: 42 }}
+          >
+            <ambientLight intensity={1} />
+            <directionalLight position={[5, 5, 5]} intensity={2.1} />
+            <pointLight position={[-5, -3, 5]} intensity={1.1} />
+            <pointLight position={[0, 4, 2]} intensity={0.7} color="#c4b5fd" />
 
-          <BackgroundOrbs />
-          <CenterBubble isDark={isDark} language={language} />
-
-          {featuredTechs.map((tech) => (
-            <TechBubble
-              key={tech.name}
-              name={tech.name}
-              position={tech.position}
-              size={tech.size}
-              color={tech.color}
-              Icon={tech.Icon}
+            <BackgroundOrbs />
+            <CenterBubble
               isDark={isDark}
+              language={language}
+              motionEnabled={motionEnabled}
             />
-          ))}
 
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.9}
-          />
-        </Canvas>
+            {featuredTechs.map((tech) => (
+              <TechBubble
+                key={tech.name}
+                name={tech.name}
+                position={tech.position}
+                size={tech.size}
+                color={tech.color}
+                Icon={tech.Icon}
+                isDark={isDark}
+                motionEnabled={motionEnabled}
+              />
+            ))}
+
+            <OrbitControls
+              enableZoom={false}
+              enablePan={false}
+              autoRotate={motionEnabled}
+              autoRotateSpeed={0.55}
+            />
+          </Canvas>
+        )}
       </div>
     </section>
   );

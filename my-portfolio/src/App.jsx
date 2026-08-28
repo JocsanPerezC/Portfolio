@@ -17,10 +17,14 @@ export default function App() {
   const [language, setLanguage] = useState("en");
   const [theme, setTheme] = useState("dark");
   const [particlesReady, setParticlesReady] = useState(false);
+  const [effectsLevel, setEffectsLevel] = useState("full");
   const cursorRef = useRef(null);
   const cursorCoreRef = useRef(null);
   const cursorVariantRef = useRef("default");
   const isDark = theme === "dark";
+  const allowParticles = particlesReady && effectsLevel === "full";
+  const allowCustomCursor = true;
+  const allowSpotlight = effectsLevel === "full";
 
   const particlesOptions = useMemo(() => {
     const isDark = theme === "dark";
@@ -37,20 +41,20 @@ export default function App() {
           value: "transparent",
         },
       },
-      fpsLimit: 60,
+      fpsLimit: 40,
       fullScreen: {
         enable: false,
         zIndex: 1,
       },
-      detectRetina: true,
+      detectRetina: false,
       particles: {
         color: {
           value: particleColor,
         },
         links: {
           color: lineColor,
-          distance: 135,
-          enable: true,
+          distance: 120,
+          enable: false,
           opacity: isDark ? 0.28 : 0.18,
           width: 1,
         },
@@ -61,18 +65,18 @@ export default function App() {
             default: "out",
           },
           random: false,
-          speed: 0.38,
+          speed: 0.22,
           straight: false,
         },
         number: {
           density: {
             enable: true,
-            area: 900,
+            area: 1200,
           },
-          value: 40,
+          value: 18,
         },
         opacity: {
-          value: isDark ? 0.3 : 0.2,
+          value: isDark ? 0.24 : 0.16,
         },
         shape: {
           type: "circle",
@@ -84,7 +88,7 @@ export default function App() {
       interactivity: {
         events: {
           onHover: {
-            enable: true,
+            enable: false,
             mode: "repulse",
           },
           resize: {
@@ -106,6 +110,57 @@ export default function App() {
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const compactViewportQuery = window.matchMedia("(max-width: 1024px)");
+
+    const updateEffectsLevel = () => {
+      const prefersReducedMotion = reducedMotionQuery.matches;
+      const hasCoarsePointer = coarsePointerQuery.matches;
+      const isCompactViewport = compactViewportQuery.matches;
+      const lowMemory =
+        typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
+      const lowCpu =
+        typeof navigator.hardwareConcurrency === "number" &&
+        navigator.hardwareConcurrency <= 4;
+
+      if (prefersReducedMotion) {
+        setEffectsLevel("minimal");
+        return;
+      }
+
+      if (hasCoarsePointer || isCompactViewport || lowMemory || lowCpu) {
+        setEffectsLevel("lite");
+        return;
+      }
+
+      setEffectsLevel("full");
+    };
+
+    const addListener = (query, listener) => {
+      if (typeof query.addEventListener === "function") {
+        query.addEventListener("change", listener);
+        return () => query.removeEventListener("change", listener);
+      }
+
+      query.addListener(listener);
+      return () => query.removeListener(listener);
+    };
+
+    updateEffectsLevel();
+
+    const cleanups = [
+      addListener(reducedMotionQuery, updateEffectsLevel),
+      addListener(coarsePointerQuery, updateEffectsLevel),
+      addListener(compactViewportQuery, updateEffectsLevel),
+    ];
+
+    return () => cleanups.forEach((cleanup) => cleanup());
   }, []);
 
   useEffect(() => {
@@ -193,7 +248,12 @@ export default function App() {
       window.matchMedia("(pointer: fine)").matches &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (!canUseCustomCursor || !cursorRef.current || !cursorCoreRef.current) {
+    if (
+      !allowCustomCursor ||
+      !canUseCustomCursor ||
+      !cursorRef.current ||
+      !cursorCoreRef.current
+    ) {
       return;
     }
 
@@ -219,13 +279,33 @@ export default function App() {
       setVariant(interactiveTarget ? "interactive" : "default");
     };
 
-    const moveCursor = (event) => {
-      const { clientX, clientY } = event;
+    let frameId = 0;
+    let nextCursorState = null;
+
+    const flushCursor = () => {
+      frameId = 0;
+
+      if (!nextCursorState) return;
+
+      const { clientX, clientY, target } = nextCursorState;
+      nextCursorState = null;
       cursor.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
       cursorCore.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
       cursor.style.opacity = "1";
       cursorCore.style.opacity = "1";
-      updateVariantFromTarget(event.target);
+      updateVariantFromTarget(target);
+    };
+
+    const moveCursor = (event) => {
+      nextCursorState = {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        target: event.target,
+      };
+
+      if (!frameId) {
+        frameId = window.requestAnimationFrame(flushCursor);
+      }
     };
 
     const handleMouseDown = () => setVariant("pressed");
@@ -254,33 +334,60 @@ export default function App() {
       window.removeEventListener("mouseup", handleMouseUp);
       window.removeEventListener("mouseenter", showCursor);
       window.removeEventListener("mouseleave", hideCursor);
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
     };
-  }, []);
+  }, [allowCustomCursor]);
 
   useEffect(() => {
     const canUseSpotlight =
       typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches;
 
-    if (!canUseSpotlight) return;
+    if (!allowSpotlight || !canUseSpotlight) return;
 
-    const handlePointerMove = (event) => {
-      const spotlightCard = event.target.closest("[data-spotlight]");
+    let frameId = 0;
+    let nextPointerState = null;
+
+    const flushSpotlight = () => {
+      frameId = 0;
+
+      if (!nextPointerState) return;
+
+      const { target, clientX, clientY } = nextPointerState;
+      const spotlightCard = target.closest("[data-spotlight]");
+      nextPointerState = null;
+
       if (!(spotlightCard instanceof HTMLElement)) return;
 
       const bounds = spotlightCard.getBoundingClientRect();
-      const x = event.clientX - bounds.left;
-      const y = event.clientY - bounds.top;
+      spotlightCard.style.setProperty("--spotlight-x", `${clientX - bounds.left}px`);
+      spotlightCard.style.setProperty("--spotlight-y", `${clientY - bounds.top}px`);
+    };
 
-      spotlightCard.style.setProperty("--spotlight-x", `${x}px`);
-      spotlightCard.style.setProperty("--spotlight-y", `${y}px`);
+    const handlePointerMove = (event) => {
+      if (!(event.target instanceof Element)) return;
+
+      nextPointerState = {
+        target: event.target,
+        clientX: event.clientX,
+        clientY: event.clientY,
+      };
+
+      if (!frameId) {
+        frameId = window.requestAnimationFrame(flushSpotlight);
+      }
     };
 
     window.addEventListener("pointermove", handlePointerMove);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
     };
-  }, []);
+  }, [allowSpotlight]);
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -290,16 +397,21 @@ export default function App() {
     <div
       className={[
         "relative min-h-screen overflow-x-hidden transition-colors duration-300",
+        effectsLevel === "full" ? "effects-full" : "effects-lite",
         theme === "dark"
           ? "bg-[#07080f] text-[#e8eaf0]"
           : "bg-[#f6f7fb] text-[#111827]",
       ].join(" ")}
     >
       <style>{`
-        @media (pointer: fine) {
+        ${
+          allowCustomCursor
+            ? `@media (pointer: fine) {
           html, body, a, button, input, textarea, select, summary, label, [role="button"] {
             cursor: none !important;
           }
+        }`
+            : ""
         }
 
         .custom-cursor-shell,
@@ -428,6 +540,17 @@ export default function App() {
           z-index: 1;
         }
 
+        .effects-lite .backdrop-blur-sm,
+        .effects-lite .backdrop-blur-md,
+        .effects-lite .backdrop-blur-xl {
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+
+        .effects-lite [data-spotlight]::before {
+          display: none;
+        }
+
         @media (pointer: coarse), (prefers-reduced-motion: reduce) {
           .custom-cursor-shell,
           .custom-cursor-core {
@@ -436,8 +559,12 @@ export default function App() {
         }
       `}</style>
 
-      <div ref={cursorRef} className="custom-cursor-shell" data-variant="default" />
-      <div ref={cursorCoreRef} className="custom-cursor-core" data-variant="default" />
+      {allowCustomCursor && (
+        <>
+          <div ref={cursorRef} className="custom-cursor-shell" data-variant="default" />
+          <div ref={cursorCoreRef} className="custom-cursor-core" data-variant="default" />
+        </>
+      )}
 
       <div
         className={[
@@ -448,7 +575,7 @@ export default function App() {
         ].join(" ")}
       />
 
-      {particlesReady && (
+      {allowParticles && (
         <Particles
           id="landing-particles"
           className="pointer-events-none fixed inset-0 z-[1]"
@@ -478,7 +605,7 @@ export default function App() {
         ].join(" ")}
       >
         <Hero theme={theme} language={language} />
-        <TechSphere theme={theme} language={language} />
+        <TechSphere theme={theme} language={language} performanceMode={effectsLevel} />
         <GithubStats theme={theme} language={language} />
         <Projects theme={theme} language={language} />
         <Contact theme={theme} language={language} />
