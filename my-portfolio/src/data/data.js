@@ -83,6 +83,20 @@ export const SKILLS = [
 
 export const PROJECTS = [
   {
+    title: "EDH Tournaments",
+    desc: "Web app for organizing Commander (EDH) and TCG tournaments: register players, generate rounds, and share live standings.",
+    tags: ["React", "Vite", "Tailwind", "Supabase"],
+    link: "https://edh-tournaments.vercel.app/",
+    image: "/images/EDHTournaments.png",
+  },
+  {
+    title: "Web 3D Inclusiva",
+    desc: "Browser-based editor that adds printable tactile textures to 3D models, creating touch-friendly materials for people with visual disabilities.",
+    tags: ["JavaScript", "Three.js", "Supabase", "3D Printing"],
+    link: "https://web3dinclusiva.vercel.app/",
+    image: "/images/Web3DInclusiva.png",
+  },
+  {
     title: "PIELS",
     desc: "Full-stack platform for learning sign language with interactive lessons, progress tracking, and user management.",
     tags: ["React", "MongoDB", "Python", "Flask", "Expo Go", "Figma"],
