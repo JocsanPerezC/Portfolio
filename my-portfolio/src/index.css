@@ -13,10 +13,6 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   font-family: "Inter", sans-serif;
 }
@@ -25,34 +21,24 @@ body {
   min-height: 100vh;
 }
 
-.reveal {
-  opacity: 0;
-  transform: translateY(16px);
-  will-change: opacity, transform;
-  transition:
-    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: var(--delay, 0ms);
+/* Hidden only while GSAP is driving reveals; without JS everything stays visible. */
+.gsap-reveal .reveal:not([data-revealed="true"]),
+.gsap-reveal .reveal-panel:not([data-revealed="true"]) {
+  visibility: hidden;
 }
 
-.reveal-panel {
-  opacity: 0;
-  transform: translateY(18px) scale(0.992);
-  will-change: opacity, transform;
-  transition:
-    opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: var(--delay, 0ms);
+@keyframes scrollHint {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(200%);
+  }
 }
 
-.reveal[data-revealed="true"] {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-panel[data-revealed="true"] {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+.scroll-hint {
+  animation: scrollHint 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
 .typewriter-text {
@@ -64,14 +50,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .reveal,
-  .reveal-panel {
-    opacity: 1;
+  .scroll-hint,
+  .typewriter-cursor {
     animation: none;
-    transform: none;
   }
 }

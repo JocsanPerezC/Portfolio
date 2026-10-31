@@ -52,12 +52,12 @@ export const PROFILE_CONTENT = {
 };
 
 export const NAV_LINKS = [
-  { label: "About", id: "about", icon: User },
-  { label: "Tech", id: "tech-sphere", icon: Cpu },
-  { label: "GitHub", id: "github", icon: Github },
-  { label: "Projects", id: "projects", icon: FolderGit2 },
-  { label: "Contact", id: "contact", icon: Mail },
-  { label: "Socials", id: "socials", icon: Share2 },
+  { label: { en: "About", es: "Inicio" }, id: "about", icon: User },
+  { label: { en: "Projects", es: "Proyectos" }, id: "projects", icon: FolderGit2 },
+  { label: { en: "Tech", es: "Tecnologías" }, id: "tech-sphere", icon: Cpu },
+  { label: { en: "GitHub", es: "GitHub" }, id: "github", icon: Github },
+  { label: { en: "Contact", es: "Contacto" }, id: "contact", icon: Mail },
+  { label: { en: "Socials", es: "Redes" }, id: "socials", icon: Share2 },
 ];
 
 export const SKILLS = [
@@ -83,39 +83,34 @@ export const SKILLS = [
 
 export const PROJECTS = [
   {
+    title: "PIELS",
+    desc: {
+      en: "Full-stack platform for learning sign language with interactive lessons, progress tracking, and user management.",
+      es: "Plataforma full-stack para aprender lengua de señas con lecciones interactivas, seguimiento de progreso y gestión de usuarios.",
+    },
+    tags: ["React", "MongoDB", "Python", "Flask", "Expo Go", "Figma"],
+    link: "https://piels-learn.vercel.app",
+    image: "/images/PIELS.png",
+  },
+  {
     title: "EDH Tournaments",
-    desc: "Web app for organizing Commander (EDH) and TCG tournaments: register players, generate rounds, and share live standings.",
+    desc: {
+      en: "Web app for organizing Commander (EDH) and TCG tournaments: register players, generate rounds, and share live standings.",
+      es: "Aplicación web para organizar torneos de Commander (EDH) y TCG: registra jugadores, genera rondas y comparte clasificaciones en vivo.",
+    },
     tags: ["React", "Vite", "Tailwind", "Supabase"],
     link: "https://edh-tournaments.vercel.app/",
     image: "/images/EDHTournaments.png",
   },
   {
     title: "Web 3D Inclusiva",
-    desc: "Browser-based editor that adds printable tactile textures to 3D models, creating touch-friendly materials for people with visual disabilities.",
+    desc: {
+      en: "Browser-based editor that adds printable tactile textures to 3D models, creating touch-friendly materials for people with visual disabilities.",
+      es: "Editor en el navegador que agrega texturas táctiles imprimibles a modelos 3D, creando materiales accesibles al tacto para personas con discapacidad visual.",
+    },
     tags: ["JavaScript", "Three.js", "Supabase", "3D Printing"],
     link: "https://web3dinclusiva.vercel.app/",
     image: "/images/Web3DInclusiva.png",
-  },
-  {
-    title: "PIELS",
-    desc: "Full-stack platform for learning sign language with interactive lessons, progress tracking, and user management.",
-    tags: ["React", "MongoDB", "Python", "Flask", "Expo Go", "Figma"],
-    link: "https://piels-learn.vercel.app",
-    image: "/images/PIELS.png",
-  },
-  {
-    title: "Gestion de Requerimientos",
-    desc: "Full-stack platform for managing software projects and their associated requirements, activities, and tasks.",
-    tags: ["React", "Node.js", "PostgreSQL"],
-    link: "https://github.com/JocsanPerezC/Proyecto-Requerimientos",
-    image: "/images/Gestion_Requerimientos_Iniciar_Sesion.png",
-  },
-  {
-    title: "Death Race",
-    desc: "Death Race is a top-down arcade game built in C++ using the Allegro graphics library.",
-    tags: ["C++", "Allegro"],
-    link: "https://github.com/JocsanPerezC/Death_race",
-    image: "/images/DeathRace.png",
   },
 ];
 

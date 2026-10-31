@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Projects from "./components/Projects";
 import Contact from "./components/Contact";
 import Socials from "./components/Socials";
 import TechSphere from "./components/TechSphere";
 import GithubStats from "./components/GithubStats";
+import { gsap, NAV_OFFSET, prefersReducedMotion, ScrollTrigger, useGSAP } from "./lib/gsap";
 
 export default function App() {
   const [activeSection, setActiveSection] = useState("about");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [visible, setVisible] = useState(false);
   const [language, setLanguage] = useState("en");
   const [theme, setTheme] = useState("dark");
   const [particlesReady, setParticlesReady] = useState(false);
@@ -21,6 +20,7 @@ export default function App() {
   const cursorRef = useRef(null);
   const cursorCoreRef = useRef(null);
   const cursorVariantRef = useRef("default");
+  const progressRef = useRef(null);
   const isDark = theme === "dark";
   const allowParticles = particlesReady && effectsLevel === "full";
   const allowCustomCursor = true;
@@ -108,11 +108,6 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
     if (typeof window === "undefined") return;
 
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -171,74 +166,86 @@ export default function App() {
     });
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        }),
-      { threshold: 0.3 }
+  // Active nav item follows the section in the middle of the viewport.
+  useGSAP(() => {
+    const triggers = gsap.utils.toArray("section[id]").map((section) =>
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 50%",
+        end: "bottom 50%",
+        onToggle: (self) => self.isActive && setActiveSection(section.id),
+      })
     );
 
-    document.querySelectorAll("section[id]").forEach((section) => {
-      observer.observe(section);
-    });
-
-    return () => observer.disconnect();
+    return () => triggers.forEach((trigger) => trigger.kill());
   }, []);
 
-  useEffect(() => {
-    const revealSelector = ".reveal, .reveal-panel";
-
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          entry.target.setAttribute("data-revealed", "true");
-          revealObserver.unobserve(entry.target);
-        });
-      },
+  // Reading progress bar.
+  useGSAP(() => {
+    gsap.fromTo(
+      progressRef.current,
+      { scaleX: 0 },
       {
-        threshold: 0.18,
-        rootMargin: "0px 0px -8% 0px",
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
       }
     );
+  }, []);
 
-    const observeReveals = (root = document) => {
-      root.querySelectorAll(revealSelector).forEach((element) => {
-        if (element.getAttribute("data-revealed") !== "true") {
-          revealObserver.observe(element);
-        }
+  // Scroll reveals for every .reveal / .reveal-panel, including ones rendered later (GitHub data).
+  useGSAP(() => {
+    const selector = ".reveal, .reveal-panel";
+    const reduced = prefersReducedMotion();
+    document.documentElement.classList.toggle("gsap-reveal", !reduced);
+    if (reduced) return;
+
+    const bind = (elements) => {
+      const fresh = elements.filter((el) => !el.dataset.revealBound);
+      if (!fresh.length) return false;
+      fresh.forEach((el) => (el.dataset.revealBound = "true"));
+
+      ScrollTrigger.batch(fresh, {
+        start: "top 88%",
+        once: true,
+        onEnter: (batch) =>
+          gsap.fromTo(
+            batch,
+            {
+              autoAlpha: 0,
+              y: (i, el) => (el.classList.contains("reveal-panel") ? 48 : 24),
+              scale: (i, el) => (el.classList.contains("reveal-panel") ? 0.97 : 1),
+              transition: "none",
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.9,
+              stagger: 0.09,
+              ease: "power3.out",
+              clearProps: "transform,transition,opacity,visibility",
+              onComplete: () => batch.forEach((el) => el.setAttribute("data-revealed", "true")),
+            }
+          ),
       });
+      return true;
     };
 
-    observeReveals();
+    bind(gsap.utils.toArray(selector));
 
-    const mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (!(node instanceof HTMLElement)) return;
-
-          if (node.matches?.(revealSelector)) {
-            revealObserver.observe(node);
-          }
-
-          observeReveals(node);
-        });
-      });
+    let refreshId = 0;
+    const observer = new MutationObserver(() => {
+      if (!bind(gsap.utils.toArray(selector))) return;
+      window.clearTimeout(refreshId);
+      refreshId = window.setTimeout(() => ScrollTrigger.refresh(), 150);
     });
-
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      revealObserver.disconnect();
-      mutationObserver.disconnect();
+      observer.disconnect();
+      window.clearTimeout(refreshId);
+      document.documentElement.classList.remove("gsap-reveal");
     };
   }, []);
 
@@ -279,6 +286,11 @@ export default function App() {
       setVariant(interactiveTarget ? "interactive" : "default");
     };
 
+    const shellX = gsap.quickTo(cursor, "x", { duration: 0.45, ease: "power3.out" });
+    const shellY = gsap.quickTo(cursor, "y", { duration: 0.45, ease: "power3.out" });
+    const coreX = gsap.quickTo(cursorCore, "x", { duration: 0.08, ease: "power2.out" });
+    const coreY = gsap.quickTo(cursorCore, "y", { duration: 0.08, ease: "power2.out" });
+
     let frameId = 0;
     let nextCursorState = null;
 
@@ -289,8 +301,10 @@ export default function App() {
 
       const { clientX, clientY, target } = nextCursorState;
       nextCursorState = null;
-      cursor.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
-      cursorCore.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
+      shellX(clientX);
+      shellY(clientY);
+      coreX(clientX);
+      coreY(clientY);
       cursor.style.opacity = "1";
       cursorCore.style.opacity = "1";
       updateVariantFromTarget(target);
@@ -390,13 +404,20 @@ export default function App() {
   }, [allowSpotlight]);
 
   const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    gsap.to(window, {
+      scrollTo: { y: target, offsetY: id === "about" ? 0 : NAV_OFFSET, autoKill: true },
+      duration: prefersReducedMotion() ? 0 : 1.1,
+      ease: "power3.inOut",
+    });
   };
 
   return (
     <div
       className={[
-        "relative min-h-screen overflow-x-hidden transition-colors duration-300",
+        "relative min-h-screen overflow-x-clip transition-colors duration-300",
         effectsLevel === "full" ? "effects-full" : "effects-lite",
         theme === "dark"
           ? "bg-[#07080f] text-[#e8eaf0]"
@@ -422,7 +443,6 @@ export default function App() {
           top: 0;
           z-index: 9999;
           opacity: 0;
-          transform: translate3d(-100px, -100px, 0);
           will-change: transform, opacity, width, height, border-radius, background-color, border-color;
         }
 
@@ -460,7 +480,6 @@ export default function App() {
             : "0 0 12px rgba(91, 79, 216, 0.3)"};
           transition:
             opacity 160ms ease,
-            transform 70ms linear,
             width 180ms ease,
             height 180ms ease,
             margin 180ms ease,
@@ -583,10 +602,14 @@ export default function App() {
         />
       )}
 
-      <Sidebar
+      <div
+        ref={progressRef}
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-[120] h-[2px] origin-left bg-gradient-to-r from-[#a599fd] to-[#7c6dfa]"
+      />
+
+      <Navbar
         activeSection={activeSection}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         scrollTo={scrollTo}
@@ -596,18 +619,11 @@ export default function App() {
         setTheme={setTheme}
       />
 
-      <main
-        className={[
-          "relative z-10 min-w-0 flex-1 transition-all duration-300 ease-out",
-          "md:ml-[220px]",
-          sidebarOpen ? "lg:ml-[220px]" : "lg:ml-[72px]",
-          visible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
-        ].join(" ")}
-      >
-        <Hero theme={theme} language={language} />
+      <main className="relative z-10 min-w-0">
+        <Hero theme={theme} language={language} scrollTo={scrollTo} />
+        <Projects theme={theme} language={language} />
         <TechSphere theme={theme} language={language} performanceMode={effectsLevel} />
         <GithubStats theme={theme} language={language} />
-        <Projects theme={theme} language={language} />
         <Contact theme={theme} language={language} />
         <Socials theme={theme} language={language} />
 
