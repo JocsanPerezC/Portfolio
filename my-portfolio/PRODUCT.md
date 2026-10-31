@@ -40,7 +40,7 @@ A versatile full-stack developer who ships complete, deployed products end to en
 
 ## Evidence on Hand
 
-- Live projects: PIELS (piels-learn.vercel.app), EDH Tournaments (edh-tournaments.vercel.app), Web 3D Inclusiva (web3dinclusiva.vercel.app). Screenshots in public/images/.
+- Live projects: PIELS (www.inclutec.org/welcome), EDH Tournaments (edh-tournaments.vercel.app), Web 3D Inclusiva (web3dinclusiva.vercel.app). Screenshots in public/images/.
 - CV PDF: public/PDF/PerezCotoJocsan_CV.pdf.
 - Profile photo: public/images/PerezCotoJocsan.png.
 - Live GitHub profile data via the public API.

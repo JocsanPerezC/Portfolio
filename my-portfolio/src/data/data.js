@@ -111,7 +111,7 @@ export const PROJECTS = [
       es: "Plataforma full-stack para aprender lengua de señas con lecciones interactivas, seguimiento de progreso y gestión de usuarios.",
     },
     tags: ["React", "MongoDB", "Python", "Flask", "Expo Go", "Figma"],
-    link: "https://piels-learn.vercel.app",
+    link: "https://www.inclutec.org/welcome",
     image: "/images/PIELS.png",
     thumb: "/images/PIELS-mobile.png",
   },
