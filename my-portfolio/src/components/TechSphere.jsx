@@ -1,344 +1,99 @@
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import {
-  Float,
-  OrbitControls,
-  Sphere,
-  Text,
-  Billboard,
-  Html,
-} from "@react-three/drei";
-import { FaReact, FaNodeJs, FaPython } from "react-icons/fa";
-import { SiTailwindcss, SiPostgresql, SiMongodb } from "react-icons/si";
+import { Float, Html, OrbitControls } from "@react-three/drei";
+import { BackSide } from "three";
+import { FaNodeJs, FaPython, FaReact } from "react-icons/fa";
+import { SiMongodb, SiPostgresql, SiTailwindcss } from "react-icons/si";
 
-const featuredTechs = [
-  {
-    name: "React",
-    position: [3, 1.2, 0],
-    size: 1.08,
-    color: "#61DAFB",
-    Icon: FaReact,
-  },
-  {
-    name: "Node.js",
-    position: [0, 1.75, 0],
-    size: 0.9,
-    color: "#68A063",
-    Icon: FaNodeJs,
-  },
-  {
-    name: "Python",
-    position: [-2.7, 0.95, 0],
-    size: 0.95,
-    color: "#3776AB",
-    Icon: FaPython,
-  },
-  {
-    name: "Tailwind",
-    position: [3.35, -1.45, 0],
-    size: 1.18,
-    color: "#38BDF8",
-    Icon: SiTailwindcss,
-  },
-  {
-    name: "PostgreSQL",
-    position: [0, -1.85, 0],
-    size: 0.98,
-    color: "#336791",
-    Icon: SiPostgresql,
-  },
-  {
-    name: "MongoDB",
-    position: [-2.85, -0.9, 0],
-    size: 0.9,
-    color: "#47A248",
-    Icon: SiMongodb,
-  },
+// Each technology is a specimen drawn in the plate idiom: an unlit flat disc of a guide colour,
+// outlined in ink, with a numbered label. Fill roles cycle through the guide palette.
+const FILL_ROLES = ["cloth", "accent", "page", "cloth", "accent", "page"];
+const SPECIMENS = [
+  { name: "React", position: [1.94, 1.25, 0.3], size: 1.0, color: "#61dafb", Icon: FaReact },
+  { name: "Node.js", position: [0.0, 2.0, -0.4], size: 0.82, color: "#5fa04e", Icon: FaNodeJs },
+  { name: "Python", position: [-1.87, 1.0, 0.2], size: 0.9, color: "#3776ab", Icon: FaPython },
+  { name: "Tailwind", position: [2.09, -1.35, -0.2], size: 0.95, color: "#38bdf8", Icon: SiTailwindcss },
+  { name: "PostgreSQL", position: [0.07, -2.0, 0.3], size: 0.9, color: "#336791", Icon: SiPostgresql },
+  { name: "MongoDB", position: [-1.94, -1.15, -0.3], size: 0.85, color: "#47a248", Icon: SiMongodb },
 ];
 
-function FloatWrapper({ children, speed, rotationIntensity, floatIntensity, motionEnabled }) {
-  if (!motionEnabled) {
-    return children;
-  }
-
+function Drift({ children, enabled }) {
+  if (!enabled) return children;
   return (
-    <Float
-      speed={speed}
-      rotationIntensity={rotationIntensity}
-      floatIntensity={floatIntensity}
-    >
+    <Float speed={1.1} rotationIntensity={0.1} floatIntensity={0.35}>
       {children}
     </Float>
   );
 }
 
-function TechBubble({
-  name,
-  position,
-  size = 1,
-  color = "#7c6dfa",
-  Icon,
-  isDark,
-  motionEnabled,
-}) {
+function Specimen({ name, position, size, color, Icon, index, motion, palette }) {
   return (
-    <FloatWrapper
-      speed={1.35}
-      rotationIntensity={0.16}
-      floatIntensity={0.55}
-      motionEnabled={motionEnabled}
-    >
+    <Drift enabled={motion}>
       <group position={position}>
         <mesh>
-          <sphereGeometry args={[size * 1.18, 18, 18]} />
-          <meshBasicMaterial color={color} transparent opacity={0.08} />
+          <sphereGeometry args={[size * 1.06, 40, 40]} />
+          <meshBasicMaterial color={palette.ink} side={BackSide} />
         </mesh>
-
-        <Sphere args={[size, 28, 28]}>
-          <meshPhysicalMaterial
-            color={color}
-            transparent
-            opacity={0.8}
-            roughness={0.14}
-            metalness={0.25}
-            clearcoat={1}
-            clearcoatRoughness={0.08}
-          />
-        </Sphere>
-
-        <Html
-          position={[0, size * 0.1, size + 0.02]}
-          center
-          distanceFactor={8}
-          transform
-          sprite
-        >
-          <div
-            className={[
-              "flex items-center justify-center rounded-full border backdrop-blur-md",
-              isDark
-                ? "border-white/15 bg-[#0f172a]/70 shadow-[0_0_30px_rgba(255,255,255,0.08)]"
-                : "border-black/10 bg-white/80 shadow-[0_0_24px_rgba(15,23,42,0.08)]",
-            ].join(" ")}
-            style={{
-              width: `${size * 36}px`,
-              height: `${size * 36}px`,
-            }}
-          >
-            <Icon
-              style={{
-                color,
-                width: `${size * 18}px`,
-                height: `${size * 18}px`,
-              }}
-            />
+        <mesh>
+          <sphereGeometry args={[size, 40, 40]} />
+          <meshBasicMaterial color={palette[FILL_ROLES[index]]} />
+        </mesh>
+        <Html position={[0, -size - 0.28, 0]} center distanceFactor={9} zIndexRange={[10, 0]}>
+          <div className="flex items-stretch whitespace-nowrap text-[15px] font-bold">
+            <span className="tabular flex w-7 items-center justify-center bg-ink text-page">{index + 1}</span>
+            <span className="flex items-center gap-1.5 border-2 border-ink bg-page px-2 py-0.5 text-ink">
+              <Icon aria-hidden="true" style={{ color }} />
+              {name}
+            </span>
           </div>
         </Html>
-
-        <Billboard>
-          <Text
-            position={[0, -size * 0.58, size + 0.03]}
-            fontSize={size * 0.16}
-            color={isDark ? "#ffffff" : "#111827"}
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={size * 2.2}
-          >
-            {name}
-          </Text>
-        </Billboard>
       </group>
-    </FloatWrapper>
+    </Drift>
   );
 }
 
-function CenterBubble({ isDark, language, motionEnabled }) {
-  return (
-    <FloatWrapper
-      speed={1}
-      rotationIntensity={0.08}
-      floatIntensity={0.3}
-      motionEnabled={motionEnabled}
-    >
-      <group position={[0, 0, -1.15]}>
-        <mesh>
-          <sphereGeometry args={[1.22, 22, 22]} />
-          <meshBasicMaterial color="#a78bfa" transparent opacity={0.08} />
-        </mesh>
-
-        <Sphere args={[1.02, 28, 28]}>
-          <meshPhysicalMaterial
-            color="#7c6dfa"
-            transparent
-            opacity={0.2}
-            roughness={0.08}
-            metalness={0.18}
-            clearcoat={1}
-            clearcoatRoughness={0.04}
-          />
-        </Sphere>
-
-        <Billboard>
-          <Text
-            position={[0, 0.08, 1.06]}
-            fontSize={0.2}
-            color={isDark ? "#ffffff" : "#111827"}
-            anchorX="center"
-            anchorY="middle"
-          >
-            Jocsan
-          </Text>
-          <Text
-            position={[0, -0.22, 1.06]}
-            fontSize={0.09}
-            color={isDark ? "#c4b5fd" : "#5b4fd8"}
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={1.8}
-          >
-            {language === "es" ? "Desarrollador Full-Stack" : "Full-Stack Developer"}
-          </Text>
-        </Billboard>
-      </group>
-    </FloatWrapper>
-  );
-}
-
-function BackgroundOrbs() {
-  return (
-    <>
-      <mesh position={[-5, 2, -4]}>
-        <sphereGeometry args={[0.65, 24, 24]} />
-        <meshBasicMaterial color="#38bdf8" transparent opacity={0.08} />
-      </mesh>
-      <mesh position={[5, -2, -4]}>
-        <sphereGeometry args={[0.8, 24, 24]} />
-        <meshBasicMaterial color="#a78bfa" transparent opacity={0.08} />
-      </mesh>
-      <mesh position={[0, 3, -5]}>
-        <sphereGeometry args={[0.5, 24, 24]} />
-        <meshBasicMaterial color="#22c55e" transparent opacity={0.06} />
-      </mesh>
-    </>
-  );
-}
-
-export default function TechSphere({ theme, language, performanceMode = "full" }) {
-  const sectionRef = useRef(null);
-  const [renderCanvas, setRenderCanvas] = useState(false);
-  const isDark = theme === "dark";
-  const motionEnabled = performanceMode === "full";
+export default function TechSphere({ language, palette, motion = true }) {
+  const containerRef = useRef(null);
+  const [visible, setVisible] = useState(() => typeof IntersectionObserver === "undefined");
 
   useEffect(() => {
-    if (!sectionRef.current || typeof IntersectionObserver === "undefined") {
-      setRenderCanvas(true);
-      return;
-    }
+    if (!containerRef.current || typeof IntersectionObserver === "undefined") return undefined;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setRenderCanvas(entry.isIntersecting);
-      },
-      { threshold: 0.2, rootMargin: "120px 0px" }
-    );
-
-    observer.observe(sectionRef.current);
-
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
+      rootMargin: "200px 0px",
+    });
+    observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section
-      id="tech-sphere"
-      ref={sectionRef}
-      className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
+    <div
+      ref={containerRef}
+      className="h-full w-full cursor-grab active:cursor-grabbing"
+      role="img"
+      aria-label={
+        language === "es"
+          ? "Modelo 3D interactivo con React, Node.js, Python, Tailwind, PostgreSQL y MongoDB alrededor de mi nombre."
+          : "Interactive 3D model with React, Node.js, Python, Tailwind, PostgreSQL and MongoDB around my name."
+      }
     >
-      <div className="mb-10">
-        <p
-          style={{ "--delay": "60ms" }}
-          className="reveal mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]"
-        >
-          {language === "es" ? "Tecnologias" : "Technologies"}
-        </p>
+      {visible && (
+        <Canvas dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }} camera={{ position: [0.0, 0, 14], fov: 42 }}>
+          <mesh position={[0, 0, -0.8]}>
+            <sphereGeometry args={[1.05, 48, 48]} />
+            <meshBasicMaterial color={palette.ink} />
+          </mesh>
+          <Html position={[0, 0, 0.4]} center distanceFactor={9} zIndexRange={[5, 0]}>
+            <span className="whitespace-nowrap font-display text-xl font-extrabold text-page">Jocsan</span>
+          </Html>
 
-        <h2
-          style={{ "--delay": "150ms" }}
-          className={[
-            "reveal text-4xl font-bold tracking-tight md:text-5xl",
-            isDark ? "text-white" : "text-[#111827]",
-          ].join(" ")}
-        >
-          {language === "es" ? "Tecnologias" : "Technologies"}
-        </h2>
+          {SPECIMENS.map((specimen, index) => (
+            <Specimen key={specimen.name} {...specimen} index={index} motion={motion} palette={palette} />
+          ))}
 
-        <p
-          style={{ "--delay": "240ms" }}
-          className={[
-            "reveal mt-4 max-w-2xl text-base leading-7",
-            isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-          ].join(" ")}
-        >
-          {language === "es"
-            ? "Una visualizacion interactiva de mis tecnologias mas importantes."
-            : "An interactive visualization of my most important technologies."}
-        </p>
-      </div>
-
-      <div
-        style={{ "--delay": "340ms" }}
-        data-spotlight
-        className={[
-          "reveal-panel h-[560px] overflow-hidden rounded-[32px] border backdrop-blur-xl",
-          isDark
-            ? "border-white/10 bg-[radial-gradient(circle_at_top,rgba(124,109,250,0.12),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]"
-            : "border-black/10 bg-[radial-gradient(circle_at_top,rgba(124,109,250,0.10),transparent_35%),linear-gradient(135deg,rgba(255,255,255,0.82),rgba(248,250,252,0.96))] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-        ].join(" ")}
-      >
-        {renderCanvas && (
-          <Canvas
-            dpr={performanceMode === "full" ? [1, 1.4] : [1, 1]}
-            gl={{
-              antialias: performanceMode === "full",
-              alpha: true,
-              powerPreference:
-                performanceMode === "full" ? "high-performance" : "low-power",
-            }}
-            camera={{ position: [0, 0, 8.5], fov: 42 }}
-          >
-            <ambientLight intensity={1} />
-            <directionalLight position={[5, 5, 5]} intensity={2.1} />
-            <pointLight position={[-5, -3, 5]} intensity={1.1} />
-            <pointLight position={[0, 4, 2]} intensity={0.7} color="#c4b5fd" />
-
-            <BackgroundOrbs />
-            <CenterBubble
-              isDark={isDark}
-              language={language}
-              motionEnabled={motionEnabled}
-            />
-
-            {featuredTechs.map((tech) => (
-              <TechBubble
-                key={tech.name}
-                name={tech.name}
-                position={tech.position}
-                size={tech.size}
-                color={tech.color}
-                Icon={tech.Icon}
-                isDark={isDark}
-                motionEnabled={motionEnabled}
-              />
-            ))}
-
-            <OrbitControls
-              enableZoom={false}
-              enablePan={false}
-              autoRotate={motionEnabled}
-              autoRotateSpeed={0.55}
-            />
-          </Canvas>
-        )}
-      </div>
-    </section>
+          <OrbitControls enableZoom={false} enablePan={false} autoRotate={motion} autoRotateSpeed={0.5} />
+        </Canvas>
+      )}
+    </div>
   );
 }

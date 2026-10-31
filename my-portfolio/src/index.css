@@ -1,57 +1,139 @@
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-@keyframes blinkCursor {
-  0%,
-  46% {
-    opacity: 1;
-  }
+/* Field guide tokens. Light is the printed guide; dark is the same book read at night. */
+:root {
+  --cloth: #1e4d36;
+  --cloth-ink: #e6efe8;
+  --spine: #14231a;
+  --page: #f2f5f1;
+  --page-2: #e3ebe4;
+  --ink: #14231a;
+  --ink-2: #3d5446;
+  --accent: #1d5fd1;
+  --tab: #f08a24;
+  --on-tab: #14231a;
+  --ok: #1f7a46;
+  --error: #b42318;
+  color-scheme: light;
+}
 
-  50%,
-  100% {
-    opacity: 0;
-  }
+:root[data-theme="dark"] {
+  --cloth: #0c1a12;
+  --cloth-ink: #cfdcd2;
+  --spine: #040a06;
+  --page: #16301f;
+  --page-2: #1d3b28;
+  --ink: #e8efe9;
+  --ink-2: #a9bdb0;
+  --accent: #9dbcff;
+  --tab: #f08a24;
+  --on-tab: #14231a;
+  --ok: #7dd3a0;
+  --error: #ff9b8f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-cloth: var(--cloth);
+  --color-cloth-ink: var(--cloth-ink);
+  --color-spine: var(--spine);
+  --color-page: var(--page);
+  --color-page-2: var(--page-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-accent: var(--accent);
+  --color-tab: var(--tab);
+  --color-on-tab: var(--on-tab);
+  --color-ok: var(--ok);
+  --color-error: var(--error);
+  --font-display: "Bricolage Grotesque", "Atkinson Hyperlegible", sans-serif;
+  --font-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+html {
+  background: var(--cloth);
+  scrollbar-color: var(--spine) var(--cloth);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  margin: 0;
+  background: var(--cloth);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Hidden only while GSAP is driving reveals; without JS everything stays visible. */
-.gsap-reveal .reveal:not([data-revealed="true"]),
-.gsap-reveal .reveal-panel:not([data-revealed="true"]) {
-  visibility: hidden;
+::selection {
+  background: var(--tab);
+  color: var(--on-tab);
 }
 
-@keyframes scrollHint {
-  0% {
-    transform: translateY(-100%);
-  }
-
-  100% {
-    transform: translateY(200%);
-  }
+:focus-visible {
+  outline: 3px solid var(--tab);
+  outline-offset: 3px;
 }
 
-.scroll-hint {
-  animation: scrollHint 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
 }
 
-.typewriter-text {
-  white-space: normal;
+p {
+  text-wrap: pretty;
 }
 
-.typewriter-cursor {
-  animation: blinkCursor 0.9s steps(1, end) infinite;
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1.5px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cloth);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--spine);
+  border: 3px solid var(--cloth);
+}
+
+/* A spread: two pages bound on a spine. Pages stack on narrow screens. */
+.spread {
+  perspective: 2400px;
+  overflow: clip;
+}
+
+.page-turn {
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-2);
+  opacity: 0.85;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scroll-hint,
-  .typewriter-cursor {
-    animation: none;
+  html {
+    scroll-behavior: auto;
   }
 }

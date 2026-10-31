@@ -1,445 +1,146 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  Star,
-  Users,
-  BookOpen,
-  ExternalLink,
-  Eye,
-  ChevronDown,
-} from "lucide-react";
-import { getFilteredRepos, getGitHubData } from "../lib/github";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Star } from "lucide-react";
+import { getGitHubData } from "../lib/github";
+import { Classification, Folio, Page, Spine, Spread } from "./Book";
 
-function StatCard({ icon: Icon, label, value, isDark, style }) {
-  return (
-    <div
-      style={style}
-      data-spotlight
-      className={[
-        "reveal-panel rounded-3xl border p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30 hover:shadow-[0_20px_80px_rgba(124,109,250,0.12)]",
-        isDark
-          ? "border-white/10 bg-white/5"
-          : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "mb-3 flex h-11 w-11 items-center justify-center rounded-2xl border",
-          isDark
-            ? "border-white/10 bg-[#111320] text-[#c4bcff]"
-            : "border-black/10 bg-[#f8fafc] text-[#475569]",
-        ].join(" ")}
-      >
-        <Icon size={18} />
-      </div>
+const PROFILE_URL = "https://github.com/JocsanPerezC";
 
-      <p
-        className={[
-          "text-2xl font-bold",
-          isDark ? "text-white" : "text-[#111827]",
-        ].join(" ")}
-      >
-        {value}
-      </p>
-
-      <p
-        className={[
-          "mt-1 text-sm",
-          isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-        ].join(" ")}
-      >
-        {label}
-      </p>
-    </div>
-  );
+function LoadingRows({ count }) {
+  return Array.from({ length: count }, (_, index) => (
+    <li key={index} aria-hidden="true" className="border-b border-ink/20 py-4">
+      <span className="block h-4 w-2/3 animate-pulse bg-page-2" />
+      <span className="mt-2 block h-3 w-1/3 animate-pulse bg-page-2" />
+    </li>
+  ));
 }
 
-function RepoCard({ repo, isDark, language, style }) {
-  return (
-    <a
-      style={style}
-      href={repo.html_url}
-      target="_blank"
-      rel="noreferrer"
-      data-spotlight
-      className={[
-        "reveal-panel group rounded-3xl border p-5 transition duration-300 hover:-translate-y-1 hover:border-[#7c6dfa]/30",
-        isDark
-          ? "border-white/10 bg-[#111320]/80 hover:bg-[#14182b]"
-          : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)] hover:bg-[#fcfcff]",
-      ].join(" ")}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <h4
-          className={[
-            "text-lg font-semibold",
-            isDark ? "text-white" : "text-[#111827]",
-          ].join(" ")}
-        >
-          {repo.name}
-        </h4>
-
-        <ExternalLink
-          size={16}
-          className={
-            isDark
-              ? "text-[#7f859f] transition group-hover:text-[#c4bcff]"
-              : "text-[#64748b] transition group-hover:text-[#7c6dfa]"
-          }
-        />
-      </div>
-
-      <p
-        className={[
-          "mt-3 min-h-[72px] text-sm leading-6",
-          isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-        ].join(" ")}
-      >
-        {repo.description || (language === "es" ? "Sin descripcion." : "No description.")}
-      </p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {repo.language && (
-          <span
-            className={[
-              "rounded-full border px-3 py-1 text-xs",
-              isDark
-                ? "border-white/10 bg-white/5 text-[#d7dbef]"
-                : "border-black/10 bg-[#f8fafc] text-[#111827]",
-            ].join(" ")}
-          >
-            {repo.language}
-          </span>
-        )}
-
-        <span
-          className={[
-            "rounded-full border px-3 py-1 text-xs",
-            isDark
-              ? "border-white/10 bg-white/5 text-[#d7dbef]"
-              : "border-black/10 bg-[#f8fafc] text-[#111827]",
-          ].join(" ")}
-        >
-          Star {repo.stargazers_count}
-        </span>
-
-        <span
-          className={[
-            "rounded-full border px-3 py-1 text-xs",
-            isDark
-              ? "border-white/10 bg-white/5 text-[#d7dbef]"
-              : "border-black/10 bg-[#f8fafc] text-[#111827]",
-          ].join(" ")}
-        >
-          Forks {repo.forks_count}
-        </span>
-      </div>
-
-      <p
-        className={[
-          "mt-4 text-xs",
-          isDark ? "text-[#7f859f]" : "text-[#64748b]",
-        ].join(" ")}
-      >
-        {language === "es" ? "Actualizado" : "Updated"}{" "}
-        {new Date(repo.updated_at).toLocaleDateString()}
-      </p>
-    </a>
-  );
-}
-
-export default function GithubStats({ theme, language }) {
-  const isDark = theme === "dark";
-
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activeLanguage] = useState("All");
-  const [isReposOpen, setIsReposOpen] = useState(false);
+export default function GithubStats({ language }) {
+  const es = language === "es";
+  const [state, setState] = useState({ status: "loading", data: null });
 
   useEffect(() => {
-    let mounted = true;
-
-    async function load() {
-      try {
-        setLoading(true);
-        const result = await getGitHubData();
-
-        if (mounted) {
-          setData(result);
-          setError("");
-        }
-      } catch {
-        if (mounted) {
-          setError(
-            language === "es"
-              ? "No se pudieron cargar los datos de GitHub."
-              : "GitHub data could not be loaded."
-          );
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    load();
-
+    let active = true;
+    getGitHubData()
+      .then((data) => active && setState({ status: "ready", data }))
+      .catch(() => active && setState({ status: "error", data: null }));
     return () => {
-      mounted = false;
+      active = false;
     };
-  }, [language]);
+  }, []);
 
-  const filteredRepos = useMemo(() => {
-    if (!data?.repos) return [];
-    return getFilteredRepos(data.repos, activeLanguage);
-  }, [data, activeLanguage]);
+  const { status, data } = state;
+  const dateFormat = new Intl.DateTimeFormat(es ? "es-CR" : "en-US", { month: "short", year: "numeric" });
+
+  const counts = data
+    ? [
+        { term: es ? "Repositorios públicos" : "Public repositories", value: data.profile.public_repos },
+        { term: es ? "Seguidores" : "Followers", value: data.profile.followers },
+        { term: es ? "Estrellas recibidas" : "Stars received", value: data.stats.totalStars },
+      ].map(({ term, value }) => ({ term, value: <span className="tabular font-display text-2xl font-bold">{value}</span> }))
+    : [];
 
   return (
-    <section
-      id="github"
-      className="relative z-10 px-6 py-24 sm:px-10 lg:px-14"
-    >
-      <div className="mb-10">
-        <p style={{ "--delay": "60ms" }} className="reveal mb-4 text-xs font-medium uppercase tracking-[0.25em] text-[#7c6dfa]">
-          GitHub
-        </p>
+    <Spread id="github" labelledBy="github-title">
+      <Page>
+        <Folio language={language} />
 
-        <h2
-          style={{ "--delay": "150ms" }}
-          className={[
-            "reveal text-4xl font-bold tracking-tight md:text-5xl",
-            isDark ? "text-white" : "text-[#111827]",
-          ].join(" ")}
-        >
-          {language === "es" ? "Actividad y estadisticas" : "Activity and stats"}
+        <h2 id="github-title" className="m-0 text-[clamp(2.25rem,3.8vw,3.5rem)] font-extrabold leading-[0.95] tracking-[-0.03em]">
+          {es ? "Actividad en GitHub" : "GitHub activity"}
         </h2>
 
-        <p
-          style={{ "--delay": "240ms" }}
-          className={[
-            "reveal mt-4 max-w-2xl text-base leading-7",
-            isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-          ].join(" ")}
-        >
-          {language === "es"
-            ? "Datos cargados dinamicamente desde mi perfil de GitHub."
-            : "Data loaded dynamically from my GitHub profile."}
-        </p>
-      </div>
+        {status === "error" && (
+          <p role="alert" className="mt-6 max-w-[46ch] border-t-2 border-error pt-4 text-ink">
+            {es
+              ? "GitHub no respondió en este momento. Puedes ver el perfil directamente."
+              : "GitHub did not respond right now. You can open the profile directly."}{" "}
+            <a href={PROFILE_URL} target="_blank" rel="noreferrer" className="font-bold text-accent underline">
+              github.com/JocsanPerezC
+            </a>
+          </p>
+        )}
 
-      {loading && (
-        <div
-          style={{ "--delay": "320ms" }}
-          className={[
-            "reveal-panel rounded-[32px] border p-8",
-            isDark
-              ? "border-white/10 bg-white/5 text-[#9aa0b8]"
-              : "border-black/10 bg-white text-[#475569] shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-          ].join(" ")}
-        >
-          {language === "es" ? "Cargando datos de GitHub..." : "Loading GitHub data..."}
-        </div>
-      )}
+        {status === "loading" && (
+          <p className="mt-6 text-ink-2" aria-live="polite">
+            {es ? "Consultando GitHub…" : "Asking GitHub…"}
+          </p>
+        )}
 
-      {error && (
-        <div className="reveal-panel rounded-[32px] border border-red-400/20 bg-red-400/10 p-8 text-red-500">
-          {error}
-        </div>
-      )}
-
-      {!loading && !error && data && (
-        <div className="space-y-8">
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-            <div
-              style={{ "--delay": "320ms" }}
-              data-spotlight
-              className={[
-                "reveal-panel rounded-[32px] border p-6 backdrop-blur-xl",
-                isDark
-                  ? "border-white/10 bg-white/5"
-                  : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-              ].join(" ")}
-            >
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <img
-                  src={data.profile.avatar_url}
-                  alt={data.profile.login}
-                  className="h-24 w-24 rounded-3xl border border-black/10 object-cover"
-                />
-
-                <div>
-                  <h3
-                    className={[
-                      "text-2xl font-bold",
-                      isDark ? "text-white" : "text-[#111827]",
-                    ].join(" ")}
-                  >
-                    {data.profile.name || data.profile.login}
-                  </h3>
-
-                  <p className="mt-1 text-[#7c6dfa]">@{data.profile.login}</p>
-
-                  <p
-                    className={[
-                      "mt-3 max-w-2xl text-sm leading-7",
-                      isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-                    ].join(" ")}
-                  >
-                    {data.profile.bio ||
-                      (language === "es"
-                        ? "Sin bio publica en GitHub."
-                        : "No public GitHub bio.")}
-                  </p>
-
-                  <a
-                    href={data.profile.html_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={[
-                      "mt-4 inline-flex items-center gap-2 text-sm font-semibold transition",
-                      isDark
-                        ? "text-white hover:text-[#c4bcff]"
-                        : "text-[#111827] hover:text-[#7c6dfa]",
-                    ].join(" ")}
-                  >
-                    {language === "es" ? "Ver perfil" : "View profile"}{" "}
-                    <ExternalLink size={16} />
-                  </a>
-                </div>
+        {data && (
+          <>
+            <div className="mt-8 flex items-start gap-5">
+              <div className="relative h-24 w-24 shrink-0 border-2 border-ink bg-page-2">
+                <img src={data.profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              </div>
+              <div>
+                <p className="m-0 font-display text-2xl font-bold leading-tight">{data.profile.name || data.profile.login}</p>
+                <a
+                  href={data.profile.html_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-accent underline"
+                >
+                  @{data.profile.login}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+                {data.profile.bio && <p className="mt-3 max-w-[48ch] text-ink-2">{data.profile.bio}</p>}
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <StatCard
-                icon={BookOpen}
-                label={language === "es" ? "Repos publicos" : "Public repos"}
-                value={data.profile.public_repos}
-                isDark={isDark}
-                style={{ "--delay": "420ms" }}
-              />
-              <StatCard
-                icon={Users}
-                label={language === "es" ? "Seguidores" : "Followers"}
-                value={data.profile.followers}
-                isDark={isDark}
-                style={{ "--delay": "500ms" }}
-              />
-              <StatCard
-                icon={Star}
-                label={language === "es" ? "Estrellas totales" : "Total stars"}
-                value={data.stats.totalStars}
-                isDark={isDark}
-                style={{ "--delay": "580ms" }}
-              />
-              <StatCard
-                icon={Eye}
-                label={language === "es" ? "Watchers totales" : "Total watchers"}
-                value={data.stats.totalWatchers}
-                isDark={isDark}
-                style={{ "--delay": "660ms" }}
-              />
+            <div className="mt-8">
+              <Classification rows={counts} />
             </div>
-          </div>
+          </>
+        )}
+      </Page>
 
-          <div
-            style={{ "--delay": "500ms" }}
-            data-spotlight
-            className={[
-              "reveal-panel rounded-[32px] border p-6 backdrop-blur-xl",
-              isDark
-                ? "border-white/10 bg-white/5"
-                : "border-black/10 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]",
-            ].join(" ")}
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3
-                  className={[
-                    "text-2xl font-bold",
-                    isDark ? "text-white" : "text-[#111827]",
-                  ].join(" ")}
-                >
-                  {language === "es"
-                    ? "Repositorios destacados"
-                    : "Highlighted repositories"}
-                </h3>
+      <Spine />
 
-                <p
-                  className={[
-                    "mt-2 text-sm",
-                    isDark ? "text-[#9aa0b8]" : "text-[#475569]",
-                  ].join(" ")}
+      <Page turn>
+        <Folio language={language} plate="VI" />
+
+        <h3 className="m-0 text-3xl font-bold tracking-[-0.02em]">
+          {es ? "Repositorios destacados" : "Highlighted repositories"}
+        </h3>
+
+        <ol className="m-0 mt-6 list-none border-t-2 border-ink p-0">
+          {status === "loading" && <LoadingRows count={5} />}
+          {data?.topRepos.map((repo, index) => (
+            <li key={repo.id} className="grid grid-cols-[2rem_1fr_auto] items-baseline gap-x-3 border-b border-ink/20 py-4">
+              <span className="tabular font-display font-bold">{index + 1}</span>
+              <div className="min-w-0">
+                <a
+                  href={repo.html_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-bold break-words text-ink hover:text-accent hover:underline"
                 >
-                  {language === "es"
-                    ? "Ordenados dinamicamente por impacto y actividad reciente."
-                    : "Dynamically ordered by impact and recent activity."}
+                  {repo.name}
+                </a>
+                <p className="m-0 mt-1 text-sm text-ink-2">
+                  {[repo.language, `${es ? "actualizado" : "updated"} ${dateFormat.format(new Date(repo.updated_at))}`]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
+              <span className="tabular inline-flex items-center gap-1 text-sm text-ink-2">
+                <Star size={14} aria-hidden="true" />
+                <span className="sr-only">{es ? "Estrellas:" : "Stars:"}</span>
+                {repo.stargazers_count}
+              </span>
+            </li>
+          ))}
+        </ol>
 
-              <button
-                type="button"
-                onClick={() => setIsReposOpen((prev) => !prev)}
-                className={[
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
-                  isDark
-                    ? "border-white/10 bg-white/5 text-white hover:border-[#7c6dfa]/30 hover:bg-[#7c6dfa]/10"
-                    : "border-black/10 bg-white text-[#111827] hover:border-[#7c6dfa]/30 hover:bg-[#f8f7ff]",
-                ].join(" ")}
-              >
-                <span>
-                  {isReposOpen
-                    ? language === "es"
-                      ? "Contraer"
-                      : "Collapse"
-                    : language === "es"
-                      ? "Expandir"
-                      : "Expand"}
-                </span>
-
-                <ChevronDown
-                  size={16}
-                  className={[
-                    "transition-transform duration-300",
-                    isReposOpen ? "rotate-180" : "rotate-0",
-                  ].join(" ")}
-                />
-              </button>
-            </div>
-
-            {isReposOpen && (
-              <div className="mt-6">
-                {filteredRepos.length === 0 ? (
-                  <div
-                    className={[
-                      "rounded-2xl border p-6",
-                      isDark
-                        ? "border-white/10 bg-[#111320]/70 text-[#9aa0b8]"
-                        : "border-black/10 bg-[#f8fafc] text-[#475569]",
-                    ].join(" ")}
-                  >
-                    {language === "es"
-                      ? "No hay repositorios para ese lenguaje."
-                      : "There are no repositories for that language."}
-                  </div>
-                ) : (
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {filteredRepos.map((repo) => (
-                      <RepoCard
-                        key={repo.id}
-                        repo={repo}
-                        isDark={isDark}
-                        language={language}
-                        style={{ "--delay": "120ms" }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </section>
+        <a
+          href={PROFILE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-auto inline-flex items-center gap-2 self-start pt-8 font-bold text-accent underline"
+        >
+          {es ? "Ver todos los repositorios" : "See every repository"}
+          <ArrowUpRight size={18} aria-hidden="true" />
+        </a>
+      </Page>
+    </Spread>
   );
 }

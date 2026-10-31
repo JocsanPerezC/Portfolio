@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "hero-eyebrow-chip",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-31T04:10:48.188Z",
+        "reason": "Claude: fixed decision-round sketch, not shipped; the build replaced the kicker with a running-head folio"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-glazier.html"
+        ],
+        "createdAt": "2026-10-31T04:25:08.669Z",
+        "reason": "Claude: unchosen decision-round sketch, not shipped; its fonts belong to the rejected direction"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-10-31T04:25:08.904Z",
+        "reason": "Claude: unchosen decision-round sketch, not shipped; its fonts belong to the rejected direction"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-10-31T04:25:09.154Z",
+        "reason": "Claude: unchosen decision-round sketch, not shipped; its fonts belong to the rejected direction"
+      }
+    ]
+  }
+}

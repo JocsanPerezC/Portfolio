@@ -23,3 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 *.env
+
+# Impeccable working files
+.impeccable/review/
+.impeccable/questions/
+.impeccable/hook.cache.json
+.impeccable/config.local.json
