@@ -54,6 +54,7 @@ export default function Projects({ language }) {
                 <Classification
                   rows={[
                     { term: es ? "Familia" : "Family", value: t(project.family) },
+                    ...(project.role ? [{ term: es ? "Mi rol" : "My role", value: t(project.role) }] : []),
                     { term: "Stack", value: project.tags.join(" · ") },
                     {
                       term: es ? "Hábitat" : "Habitat",

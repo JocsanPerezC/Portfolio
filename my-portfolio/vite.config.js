@@ -7,4 +7,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    // The 3D model chunk (Three.js + drei) is ~870 kB and loads lazily near its section,
+    // so it never blocks the first paint. Keep the warning for anything bigger.
+    chunkSizeWarningLimit: 900,
+  },
 })

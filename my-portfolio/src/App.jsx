@@ -5,7 +5,6 @@ import Projects from "./components/Projects";
 import Technologies from "./components/Technologies";
 import GithubStats from "./components/GithubStats";
 import Contact from "./components/Contact";
-import Controls from "./components/Controls";
 import { NAV_LINKS, PROFILE_CONTENT } from "./data/data";
 import { gsap, prefersReducedMotion, ScrollTrigger, useGSAP } from "./lib/gsap";
 
@@ -154,7 +153,7 @@ export default function App() {
       >
         <Hero language={language} scrollTo={scrollTo} setLanguage={setLanguage} theme={theme} setTheme={setTheme} />
         <Projects language={language} />
-        <Technologies language={language} theme={theme} motion={motion} />
+        <Technologies language={language} theme={theme} />
         <GithubStats language={language} />
         <Contact language={language} />
 
@@ -163,13 +162,6 @@ export default function App() {
             {PROFILE_CONTENT.firstName} {PROFILE_CONTENT.lastName} · {PROFILE_CONTENT.location}
           </span>
           <span>{es ? "Hecho con React, Tailwind y GSAP" : "Built with React, Tailwind and GSAP"}</span>
-          <Controls
-            className="w-28 lg:hidden"
-            language={language}
-            setLanguage={setLanguage}
-            theme={theme}
-            setTheme={setTheme}
-          />
         </footer>
       </main>
     </>

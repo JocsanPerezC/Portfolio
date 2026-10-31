@@ -1,10 +1,36 @@
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { TECH_GROUPS, SKILLS } from "../data/data";
 import { Folio, Page, Spine, Spread } from "./Book";
-import TechSphere from "./TechSphere";
 import { PALETTES } from "../lib/styles";
 
-export default function Technologies({ language, theme, motion }) {
+// Three.js and its helpers ship in their own chunk, fetched only when this plate nears the viewport.
+const TechSphere = lazy(() => import("./TechSphere"));
+
+function useNearViewport(ref) {
+  const [near, setNear] = useState(() => typeof IntersectionObserver === "undefined");
+
+  useEffect(() => {
+    if (!ref.current || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(([entry]) => setNear(entry.isIntersecting), {
+      rootMargin: "300px 0px",
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return near;
+}
+
+export default function Technologies({ language, theme }) {
   const es = language === "es";
+  const frameRef = useRef(null);
+  const near = useNearViewport(frameRef);
+
+  const loading = (
+    <p className="absolute inset-0 m-0 flex items-center justify-center text-sm text-ink-2">
+      {es ? "Cargando modelo…" : "Loading model…"}
+    </p>
+  );
 
   return (
     <Spread id="tech-sphere" labelledBy="tech-title">
@@ -43,9 +69,24 @@ export default function Technologies({ language, theme, motion }) {
 
       <Page turn>
         <Folio language={language} plate="V" />
-        <div className="relative min-h-[420px] flex-1 border-2 border-ink bg-page-2 lg:min-h-[520px]">
+        <div
+          ref={frameRef}
+          role="img"
+          aria-label={
+            es
+              ? "Modelo 3D interactivo con React, Node.js, Python, Tailwind, PostgreSQL y MongoDB alrededor de mi nombre."
+              : "Interactive 3D model with React, Node.js, Python, Tailwind, PostgreSQL and MongoDB around my name."
+          }
+          className="relative min-h-[420px] flex-1 cursor-grab border-2 border-ink bg-page-2 active:cursor-grabbing lg:min-h-[520px]"
+        >
           <div className="absolute inset-0">
-            <TechSphere language={language} palette={PALETTES[theme] ?? PALETTES.light} motion={motion} />
+            {near ? (
+              <Suspense fallback={loading}>
+                <TechSphere palette={PALETTES[theme] ?? PALETTES.light} />
+              </Suspense>
+            ) : (
+              loading
+            )}
           </div>
         </div>
         <p className="mt-3 text-sm text-ink-2">

@@ -255,7 +255,7 @@ The signature fact table: a definition list with a term column of at least 7.5re
 - **Error / Success:** a status line beside the submit button, error in Heliconia Red bold, success in Leaf Green bold with a check icon, announced politely.
 
 ### Navigation
-- **Desktop fore-edge index:** a fixed column of Toucan Orange tabs cut into the book's right edge, vertically centred, 44px tall, 13px bold on-tab text. Rest width 106px, hover 112px, active 118px with a 10px square on-tab notch before the label; width animates 300ms ease-out. The active tab is marked by position and notch, never by a different colour. Language and theme controls sit beneath it.
+- **Desktop fore-edge index:** a fixed column of Toucan Orange tabs cut into the book's right edge, vertically centred, 44px tall, 14px bold on-tab text. Rest width 106px, hover 112px, active 118px with a 10px square on-tab notch before the label; width animates 300ms ease-out. The active tab is marked by position and notch, never by a different colour. Language and theme controls sit beneath it.
 - **Mobile tab bar:** a fixed bottom bar on the spine colour, five orange tabs (52px tall) with an 18px line icon over a 12px label; the active tab carries a 4px on-tab bar along its top edge. Respects the safe-area inset.
 - **Control tabs:** language (ES/EN) and theme (moon/sun) as square page-coloured tabs with a 2px ink frame, hover page-2. 44px in the index; 40px compact on the mobile opening folio line.
 
@@ -266,7 +266,8 @@ Every page opens with a folio: the running head on legend pages, "Plate N" (roma
 - **Opening:** the name lines rise from 105% below their masks (expo.out, 1.1s, 0.08s stagger); lead, table and buttons fade up 18px (0.9s); the right page swings in from -70° on the spine (1.3s); chips stamp in from 1.6× scale (back.out(2), 0.45s, 0.09s stagger).
 - **Scroll:** from 1024px, each later spread's right page turns from -80° to flat, scrubbed (0.6) between the spread entering and reaching 35% from the top, while its shade fades from 0.6 to 0. Chips stamp once at 70%.
 - **Anchors:** in-page jumps use a 1s power3.inOut scroll.
-- **Reduced motion:** all of the above is skipped; jumps are instant; the 3D model stops rotating.
+- **3D model:** nothing floats or spins on its own; the visitor turns the model by dragging. Its specimens use only cloth, accent and page fills, and label icons are drawn in ink. The model's code loads lazily when its plate comes within 300px of the viewport.
+- **Reduced motion:** all of the above is skipped and jumps are instant.
 
 ## Do's and Don'ts
 

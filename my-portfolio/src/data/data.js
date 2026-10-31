@@ -99,16 +99,20 @@ export const PROJECTS = [
   {
     title: "PIELS",
     family: {
-      en: "Full-stack learning platform",
-      es: "Plataforma educativa full-stack",
+      en: "Sign language platform",
+      es: "Plataforma de lengua de señas",
     },
     short: {
-      en: "Sign language lessons",
-      es: "Lecciones de lengua de señas",
+      en: "Sign language with an avatar and AI",
+      es: "Lengua de señas con avatar e IA",
     },
     desc: {
-      en: "Full-stack platform for learning sign language with interactive lessons, progress tracking, and user management.",
-      es: "Plataforma full-stack para aprender lengua de señas con lecciones interactivas, seguimiento de progreso y gestión de usuarios.",
+      en: "Platform from Inclutec at the Tecnológico de Costa Rica that turns Spanish text into Costa Rican Sign Language (LESCO) and other sign languages. An animated avatar signs the result, backed by community dictionaries and AI translation from audio and text.",
+      es: "Plataforma de Inclutec, del Tecnológico de Costa Rica, que transforma texto en español a Lengua de Señas Costarricense (LESCO) y otros lenguajes de señas. Un avatar animado interpreta las señas, con diccionarios colaborativos y traducción por IA desde audio y texto.",
+    },
+    role: {
+      en: "Programmer in the Inclutec team",
+      es: "Programador en el equipo de Inclutec",
     },
     tags: ["React", "MongoDB", "Python", "Flask", "Expo Go", "Figma"],
     link: "https://www.inclutec.org/welcome",

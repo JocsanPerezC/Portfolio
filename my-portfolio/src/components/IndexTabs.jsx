@@ -26,7 +26,7 @@ export default function IndexTabs({ activeSection, scrollTo, language, setLangua
               onClick={() => scrollTo(item.id)}
               aria-current={active ? "location" : undefined}
               className={[
-                "flex min-h-11 items-center gap-2 bg-tab pl-2.5 text-left text-[13px] font-bold text-on-tab transition-[width] duration-300 ease-out",
+                "flex min-h-11 items-center gap-2 bg-tab pl-2.5 text-left text-sm font-bold text-on-tab transition-[width] duration-300 ease-out",
                 active ? "w-[118px]" : "w-[106px] hover:w-[112px]",
               ].join(" ")}
             >
