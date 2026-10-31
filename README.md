@@ -1,136 +1,64 @@
-# My Portfolio
+# Jocsan Perez Coto · Portfolio
 
-> Personal portfolio website — React + Vite + EmailJS
+Personal portfolio of a full-stack developer from Cartago, Costa Rica.
 
----
+**Live site:** https://portfoliojocsanperez.vercel.app
 
-## Description
+![Preview of the portfolio](my-portfolio/public/og-image.png)
 
-A personal portfolio built to showcase projects, skills, and contact information. It features a collapsible sidebar navigation, smooth scroll-based section tracking, an interactive contact form powered by EmailJS, and a downloadable CV. The layout is clean and responsive, with a dark aesthetic and subtle background effects.
+## Concept
 
----
+The site is designed as a Costa Rican field guide. Each section is an open two-page spread bound on a spine. Projects are numbered specimens with a classification table. Navigation is a set of orange thumb-index tabs on the edge of the book.
 
-## Tech Stack
+As you scroll, the right-hand page of each spread turns on the spine, driven by GSAP ScrollTrigger. Motion is reduced to static pages when the visitor's system asks for reduced motion.
+
+## What's inside
+
+| Section | Content |
+|---|---|
+| Plate I | Name, role, a short classification table, and links to projects and the CV |
+| Plates II–IV | One spread per project: live screenshot, description, stack, and a link to the live site |
+| Plate V | Index of technologies by layer, plus an interactive 3D model you can drag |
+| Plate VI | Live GitHub profile data and the most starred repositories |
+| Plate VII | Email, social links, CV download, and a contact form |
+
+The page works in English and Spanish, and in light and dark themes. Both preferences are remembered in the browser.
+
+## Featured projects
+
+| Project | What it is | Link |
+|---|---|---|
+| PIELS | Sign language platform from Inclutec at the Tecnológico de Costa Rica. It turns Spanish text into Costa Rican Sign Language (LESCO) with an animated avatar. I work on it as a programmer in the team. | [inclutec.org](https://www.inclutec.org/welcome) |
+| EDH Tournaments | Web app to organize Commander and TCG tournaments: players, rounds and live standings | [edh-tournaments.vercel.app](https://edh-tournaments.vercel.app/) |
+| Web 3D Inclusiva | In-browser editor that adds printable tactile textures to 3D models | [web3dinclusiva.vercel.app](https://web3dinclusiva.vercel.app/) |
+
+## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, Vite |
-| Icons | react-icons, lucide-react |
-| Contact Form | EmailJS (@emailjs/browser) |
-| Styling | Plain CSS (per-component stylesheets) |
-| Linting | ESLint |
+| UI | React 18, Vite |
+| Styling | Tailwind CSS v4 with CSS custom-property tokens |
+| Motion | GSAP with ScrollTrigger and ScrollToPlugin |
+| 3D | Three.js through React Three Fiber and drei, loaded lazily |
+| Data | GitHub REST API |
+| Contact form | EmailJS |
+| Icons | lucide-react, react-icons |
 
----
+## Run it locally
 
-## Features
-
-### 🧭 Navigation
-- Collapsible sidebar with smooth scroll to each section
-- Active section tracking via IntersectionObserver
-- Mobile-friendly toggle
-
-### 👤 About
-- Hero section with name, title, and short bio
-- Profile photo display
-- Downloadable CV button
-
-### 🛠 Skills
-- Visual grid of technologies with icons
-- Covers frontend, backend, databases, DevOps, and design tools
-
-### 📁 Projects
-- Project cards with title, description, tags, and links
-- Includes screenshots for each project
-
-### 📬 Contact
-- Contact form with name, email, and message fields
-- Sent via EmailJS (no backend required)
-- Success and error feedback states
-
-### 🔗 Socials
-- Links to GitHub, LinkedIn, and Instagram
-
----
-
-## Project Structure
-
-```
-Portfolio-main/
-└── my-portfolio/
-    ├── public/
-    │   ├── images/                 # Project screenshots and profile photo
-    │   └── PDF/
-    │       └── PerezCotoJocsan_CV.pdf
-    ├── src/
-    │   ├── App.jsx                 # Root layout, sidebar state, section observer
-    │   ├── App.css                 # Global layout styles
-    │   ├── main.jsx                # React entry point
-    │   ├── index.css               # Base resets
-    │   ├── components/
-    │   │   ├── Hero.jsx            # About section — name, bio, CV download
-    │   │   ├── Sidebar.jsx         # Collapsible navigation sidebar
-    │   │   ├── Skills.jsx          # Skills icon grid
-    │   │   ├── Projects.jsx        # Project cards
-    │   │   ├── Contact.jsx         # EmailJS contact form
-    │   │   └── Socials.jsx         # Social media links
-    │   ├── data/
-    │   │   └── data.js             # NAV_LINKS, SKILLS, PROJECTS, SOCIALS, CV_PATH
-    │   └── styles/
-    │       ├── hero.css
-    │       ├── sidebar.css
-    │       ├── skills.css
-    │       ├── projects.css
-    │       ├── contact.css
-    │       └── socials.css
-    ├── package.json
-    ├── vite.config.js
-    └── eslint.config.js
-```
-
----
-
-## Projects Showcased
-
-| Project | Stack | Link |
-|---|---|---|
-| PIELS | React, MongoDB, Python, Flask, Expo Go, Figma | [piels-learn.vercel.app](https://piels-learn.vercel.app) |
-| Gestion de Requerimientos | React, Node.js, PostgreSQL | [GitHub](https://github.com/JocsanPerezC/Proyecto-Requerimientos) |
-| Death Race | C++, Allegro | [GitHub](https://github.com/JocsanPerezC/Death_race) |
-
----
-
-## Skills Covered
-
-`React` `Node.js` `Python` `HTML5` `CSS3` `JavaScript` `TypeScript` `Tailwind` `Express` `PostgreSQL` `MongoDB` `MySQL` `Redis` `Git` `GitHub` `Docker` `Linux` `AWS` `Flask` `Figma` `Expo`
-
----
-
-## Setup & Run
-
-### Prerequisites
-
-- Node.js 18+
-- An [EmailJS](https://www.emailjs.com/) account with a service, template, and public key set up
-
-### Install & Dev Server
+You need Node.js 20.19+ or 22.12+, which Vite 8 requires.
 
 ```bash
 cd my-portfolio
 npm install
 npm run dev
-# Runs on http://localhost:5173
 ```
 
-### Build for Production
+The dev server runs on http://localhost:5173.
 
-```bash
-npm run build
-npm run preview
-```
+### Environment variables
 
-### Environment Variables
-
-Create a `.env` file in `my-portfolio/` with your EmailJS credentials:
+The contact form needs EmailJS credentials. Create `my-portfolio/.env`:
 
 ```env
 VITE_EMAILJS_SERVICE_ID=your_service_id
@@ -138,18 +66,58 @@ VITE_EMAILJS_TEMPLATE_ID=your_template_id
 VITE_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
+`VITE_GITHUB_TOKEN` is supported but optional. Leave it unset in production: any `VITE_` variable is bundled into the public JavaScript.
+
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Build for production into `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | Run ESLint |
+
+## Project structure
+
+```
+my-portfolio/
+├── PRODUCT.md            # Audience, purpose and content rules
+├── DESIGN.md             # Design system: tokens, type, components, motion
+├── index.html            # Fonts, metadata, social preview
+├── public/
+│   ├── images/           # Project screenshots and profile photo
+│   ├── PDF/              # CV
+│   └── og-image.png      # Link preview image
+└── src/
+    ├── App.jsx           # Theme, language, section tracking, GSAP choreography
+    ├── index.css         # Colour tokens for light and dark themes
+    ├── data/data.js      # Profile, projects, technologies and socials
+    ├── lib/              # GSAP setup, GitHub client, shared styles
+    └── components/
+        ├── Book.jsx          # Spread, Page, Folio, Chip, Classification, Figure
+        ├── IndexTabs.jsx     # Thumb-index navigation and mobile tab bar
+        ├── Hero.jsx          # Plate I
+        ├── Projects.jsx      # Plates II–IV
+        ├── Technologies.jsx  # Plate V
+        ├── TechSphere.jsx    # The 3D model
+        ├── GithubStats.jsx   # Plate VI
+        ├── Contact.jsx       # Plate VII
+        └── Controls.jsx      # Language and theme switches
+```
+
+## Editing content
+
+Most content lives in `src/data/data.js`:
+
+- `PROFILE_CONTENT` holds name, role, summary, location and email.
+- `PROJECTS` holds each project's text in both languages, stack, link and screenshots.
+- `TECH_GROUPS` holds the technologies shown in the index.
+- `SOCIALS` and `CV_PATH` hold the contact links and the CV file.
+
+## Deployment
+
+The site deploys to Vercel from the `main` branch, with `my-portfolio` as the project's root directory.
+
 ---
 
-## Customization
-
-All content is centralized in `src/data/data.js`. To update the portfolio just edit that file:
-
-- `NAV_LINKS` — sidebar navigation items
-- `SKILLS` — skill icons and labels
-- `PROJECTS` — project cards (title, description, tags, link, image)
-- `SOCIALS` — social media links
-- `CV_PATH` — path to the downloadable CV file
-
----
-
-*Developed by Jocsan Pérez Coto — ITCR.*
+Developed by Jocsan Pérez Coto, Tecnológico de Costa Rica.
